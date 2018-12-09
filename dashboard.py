@@ -9,7 +9,7 @@ import dash_table
 
 app = dash.Dash()
 
-df = pd.read_csv('../Users/jamesswank/tempoct18.txt')
+df = pd.read_csv('./data/tempoct18.txt')
 
 app.layout = html.Div([
     dcc.Graph(
@@ -17,21 +17,15 @@ app.layout = html.Div([
         figure={
             'data': [
                 go.Scatter(
-                    x = df['X'],
-                    y = df['Y'],
-                    mode = 'markers'
+                    x = df[df.columns[0]],
+                    y = df[df.columns[1]],
+                    mode = 'lines'
                     )
-            ],
-            'layout': go.Layout(
-                title = 'Old Faithful Eruption Intervals v Durations',
-                xaxis = {'title': 'Duration of eruption (minutes)'},
-                yaxis = {'title': 'Interval to next eruption (minutes)'},
-                hovermode='closest'
-            )
-
-        }
+                ]
+            }
     )
 ])
+
 
 if __name__ == '__main__':
     app.run_server()
