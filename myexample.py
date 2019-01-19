@@ -1,4 +1,7 @@
+import numpy as np 
 import pandas as pd 
 
-df = pd.read_csv('salaries.csv')
+mat = np.arange(0,50).reshape(5,10)
+
+df = pd.DataFrame(data=mat)
 print(df)
