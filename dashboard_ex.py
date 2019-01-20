@@ -31,7 +31,10 @@ app.layout = html.Div([dcc.Graph(id='old_faithful',
                                 x = df['X'],
                                 y = df['Y'],
                                 mode = 'markers')]
-                        ,'layout':go.Layout(title='Old Faithful Eruptions')})])
+                        ,'layout':go.Layout(
+                            title='Old Faithful Eruptions',
+                            xaxis={'title': 'Duration'},
+                            yaxis={'title': 'Interval'})})])
 
 
 # Add the server clause:
