@@ -1,7 +1,12 @@
-import numpy as np 
-import pandas as pd 
-import matplotlib.pyplot as plt 
+import dash  
+import dash_core_components as dcc 
+import dash_html_components as html 
 
-df = pd.DataFrame(np.random.randn(100,4),columns='A B C D'.split())
-df.plot()
-plt.show()
+app = dash.Dash()
+
+app.layout = html.Div(children=[
+    html.H1('Hello Dash')
+])
+
+if __name__ == '__main__':
+    app.run_server()
