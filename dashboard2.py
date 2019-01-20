@@ -17,9 +17,16 @@ app.layout = html.Div([dcc.Graph(id='scatterplot',
                             go.Scatter(
                                 x=random_x,
                                 y=random_y,
-                                mode='markers'
-                            )],
-                            'layout':go.Layout(title='Scatterplot')}
+                                mode='markers',
+                                marker = {
+                                    'size':12,
+                                    'color':'rgb(51,204,153)',
+                                    'symbol':'pentagon',
+                                    'line':{'width':2}
+                                }
+                                )],
+                            'layout':go.Layout(title='Scatterplot',
+                                                xaxis = {'title': 'Some X title'})}
                     )])
 
 if __name__ == '__main__':
