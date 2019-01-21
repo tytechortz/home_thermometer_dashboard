@@ -23,17 +23,18 @@ import pandas as pd
 app = dash.Dash()
 
 # Create a DataFrame from the .csv file:
-df = pd.read_csv('./Data/tempoct18.csv')
+df = pd.read_csv('../../tempjan19.txt')
+# df = df.to_json()
 
 
 # Create a Dash layout that contains a Graph component:
 data = [go.Scatter(
     x = df.X,
     y = df.Y,
-    mode = 'markers',
+    mode = 'lines',
     )]
 
-layout = go.Layout(title='Plot',
+layout = go.Layout(title='Home',
                     xaxis= {'title':'MY X AXIS'},
                     yaxis= dict(title='MY Y AXIS'),
                     hovermode='closest')
