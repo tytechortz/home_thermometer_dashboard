@@ -24,24 +24,30 @@ app = dash.Dash()
 
 # Create a DataFrame from the .csv file:
 df = pd.read_csv('../../tempjan19.txt')
-# df = df.to_json()
+
 
 
 # Create a Dash layout that contains a Graph component:
-data = [go.Scatter(
-    x = df.X,
-    y = df.Y,
-    mode = 'lines',
-    )]
-
-layout = go.Layout(title='Home',
-                    xaxis= {'title':'MY X AXIS'},
-                    yaxis= dict(title='MY Y AXIS'),
-                    hovermode='closest')
-
-fig = go.Figure(data=data,layout=layout)
-pyo.plot(fig, filename='scatter1.html')
-
+app.layout = html.Div([
+    dcc.Graph(
+        id='home_thermo',
+        figure={
+            'data': [
+                go.Scatter(
+                    x = df[0],
+                    y = df[1],
+                    mode = 'markers'
+                )
+            ],
+            'layout': go.Layout(
+                title = 'Home Temperature',
+                xaxis = {'title': 'Date'},
+                yaxis = {'title': 'Temperature'},
+                hovermode='closest'
+            )
+        }
+    )
+])
 
 
 # Add the server clause:
