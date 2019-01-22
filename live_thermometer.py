@@ -12,6 +12,10 @@ app = dash.Dash()
 
 app.layout = html.Div([
     html.Div([
+        id='temp_text',
+        children='Max Temp:'
+    ]),
+    html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
     dcc.Interval(
         id='interval-component',
