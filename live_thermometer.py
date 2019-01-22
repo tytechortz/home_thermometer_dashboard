@@ -26,3 +26,7 @@ def update_graph(n):
             y = df['Z'],
             mode = 'lines+markers'
         )])
+    return fig 
+
+if __name__ == '__main__':
+    app.run_server
