@@ -23,7 +23,8 @@ import pandas as pd
 app = dash.Dash()
 
 # Create a DataFrame from the .csv file:
-df = pd.read_csv('../../tempjan19.txt')
+# df = pd.read_csv('../../tempjan19.txt')
+df = pd.read_csv('./Data/tempoct17.txt')
 
 
 
@@ -35,13 +36,15 @@ app.layout = html.Div([
             'data': [
                 go.Scatter(
                     x = df['X'],
-                    y = df['Y'],
+                    y = df['Z'],
                     mode = 'markers'
                 )
             ],
             'layout': go.Layout(
                 title = 'Home Temperature',
-                xaxis = {'title': 'Date'},
+                xaxis = {
+                    'title': 'Date',
+                    },
                 yaxis = {'title': 'Temperature'},
                 hovermode='closest'
             )
