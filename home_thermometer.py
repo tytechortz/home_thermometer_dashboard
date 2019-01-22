@@ -34,8 +34,8 @@ app.layout = html.Div([
         figure={
             'data': [
                 go.Scatter(
-                    x = df[0],
-                    y = df[1],
+                    x = df['X'],
+                    y = df['Y'],
                     mode = 'markers'
                 )
             ],
