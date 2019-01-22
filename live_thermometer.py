@@ -19,3 +19,10 @@ app.layout = html.Div([
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
+def update_graph(n):
+    fig = go.Figure(
+        data = [go.Scatter(
+            x = df['X'],
+            y = df['Z'],
+            mode = 'lines+markers'
+        )])
