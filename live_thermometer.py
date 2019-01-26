@@ -22,7 +22,10 @@ app.layout = html.Div([
         id='daily-high',
         children='Daily High:'
     ),
-    ]),
+    html.Pre(
+        id='daily-low',
+        children='Daily Low:'
+    )]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
     dcc.Interval(
@@ -42,14 +45,20 @@ def update_layout(n):
     f = (9/5) * data + 32
     return 'Current Temperature: {:.1f}'.format(f)
 
-
-
 @app.callback(Output('daily-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_b(n):
+    df = pd.read_csv('../../temptest.txt')
     daily_high = df['Y'].max()
     return 'Daily High: {:.1f}'.format(daily_high)
-    
+
+@app.callback(Output('daily-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_c(n):
+    df = pd.read_csv('../../temptest.txt')
+    daily_low = df['Y'].min()
+    return 'Daily Low: {:.1f}'.format(daily_low)
+
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
@@ -61,9 +70,6 @@ def update_graph(n):
             mode = 'markers+lines'
         )])
     return fig 
-
-
-
 
 
 if __name__ == '__main__':
