@@ -35,7 +35,8 @@ def update_layout(n):
     url = "http://10.0.1.7:8080"
     res = requests.get(url)
     data = res.json()
-    return 'Current Temperature: {}'.format(data)
+    f = (9/5) * data + 32
+    return 'Current Temperature: {}'.format(f)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
