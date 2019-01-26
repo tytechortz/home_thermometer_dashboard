@@ -15,9 +15,13 @@ df = pd.read_csv('../../temptest.txt')
 app.layout = html.Div([
     html.Div([
     html.Pre(
-        id='live_thermometer',
-         children='Current Temperature:'
-        ),
+        id='live-thermometer',
+        children='Current Temperature:'
+    ),
+    html.Pre(
+        id='daily-high',
+        children='Daily High:'
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
@@ -30,13 +34,21 @@ app.layout = html.Div([
 
 url = "http://10.0.1.7:8080"
 
-@app.callback(Output('live_thermometer', 'children'),
+@app.callback(Output('live-thermometer', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout(n):
     res = requests.get(url)
     data = res.json()
     f = (9/5) * data + 32
     return 'Current Temperature: {:.1f}'.format(f)
+
+
+
+@app.callback(Output('daily-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_b(n):
+    daily_high = df['Y'].max()
+    return 'Daily High: {:.1f}'.format(daily_high)
     
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
