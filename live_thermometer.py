@@ -28,16 +28,16 @@ app.layout = html.Div([
     )])
 ])
 
+url = "http://10.0.1.7:8080"
 
 @app.callback(Output('live_thermometer', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout(n):
-    url = "http://10.0.1.7:8080"
     res = requests.get(url)
     data = res.json()
     f = (9/5) * data + 32
-    return 'Current Temperature: {}'.format(f)
-
+    return 'Current Temperature: {:.1f}'.format(f)
+    
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
