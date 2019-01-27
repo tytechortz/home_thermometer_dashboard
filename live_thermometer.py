@@ -33,12 +33,12 @@ app.layout = html.Div([
         children='Daily Low:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':10},
+        style={'color': 'red', 'font-size':15},
         id='monthly-high',
         children='Monthly High:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':10},
+        style={'color': 'blue', 'font-size':15},
         id='monthly-low',
         children='Monthly Low:'
     ),
@@ -79,15 +79,15 @@ def update_layout_c(n):
 @app.callback(Output('monthly-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_d(n):
-    df = pd.read_csv('../../temptest.txt')
-    monthly_high = df['Y'].max()
+    df = pd.read_csv('../../tempjan19.txt', header=None)
+    monthly_high = df[1].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
 @app.callback(Output('monthly-low', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_e(n):
-    df = pd.read_csv('../../temptest.txt')
-    monthly_low = df['Y'].min()
+    df = pd.read_csv('../../tempjan19.txt', header=None)
+    monthly_low = df[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
 @app.callback(Output('live-update-graph', 'figure'),
