@@ -31,14 +31,25 @@ app.layout = html.Div([
         style={'color': 'blue', 'font-size':20},
         id='daily-low',
         children='Daily Low:'
-    )]),
+    ),
+    html.Pre(
+        style={'color': 'red', 'font-size':10},
+        id='monthly-high',
+        children='Monthly High:'
+    ),
+    html.Pre(
+        style={'color': 'blue', 'font-size':10},
+        id='monthly-low',
+        children='Monthly Low:'
+    ),
+    ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
     dcc.Interval(
         id='interval-component',
         interval=60000,
         n_intervals=0
-    )])
+    )]),
 ])
 
 url = "http://10.0.1.7:8080"
