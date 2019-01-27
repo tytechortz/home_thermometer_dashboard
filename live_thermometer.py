@@ -78,14 +78,14 @@ def update_layout_c(n):
 
 @app.callback(Output('monthly-high', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_b(n):
+def update_layout_d(n):
     df = pd.read_csv('../../temptest.txt')
     daily_high = df['Y'].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
 @app.callback(Output('daily-low', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_c(n):
+def update_layout_e(n):
     df = pd.read_csv('../../temptest.txt')
     daily_low = df['Y'].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
