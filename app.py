@@ -6,17 +6,22 @@ import plotly.graph_objs as go
 import requests
 import pandas as pd 
 
-app = dash.Dash()
+app = dash.Dash(__name__)
 
 df = pd.read_csv('../../temptest.txt')
 
-
+colors = {
+         'background': '#0000FF',
+         'color': '#FFA500'
+}
 
 app.layout = html.Div([
     html.Div([
-    html.Pre(
+    html.Pre(style=colors,
         id='live-thermometer',
-        children='Current Temperature:'
+        children=[
+            html.H1('Current Temperature:')
+        ]
     ),
     html.Pre(
         id='daily-high',
@@ -73,4 +78,4 @@ def update_graph(n):
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
