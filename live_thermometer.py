@@ -17,17 +17,18 @@ colors = {
 
 app.layout = html.Div([
     html.Div([
-    html.Pre(style=colors,
+    html.Pre(
+        style={'color': 'green', 'font-size':35},
         id='live-thermometer',
-        children=[
-            html.H1('Current Temperature:')
-        ]
+        children='Current Temperature:'
     ),
     html.Pre(
+        style={'color': 'red', 'font-size':20},
         id='daily-high',
         children='Daily High:'
     ),
     html.Pre(
+        style={'color': 'blue', 'font-size':20},
         id='daily-low',
         children='Daily Low:'
     )]),
@@ -72,7 +73,11 @@ def update_graph(n):
         data = [go.Scatter(
             x = df['X'],
             y = df['Y'],
-            mode = 'markers+lines'
+            mode = 'markers+lines',
+            marker=dict(
+                color = 'orange',
+            ),
+
         )])
     return fig 
 
