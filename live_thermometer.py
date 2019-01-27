@@ -76,6 +76,20 @@ def update_layout_c(n):
     daily_low = df['Y'].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
 
+@app.callback(Output('monthly-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_b(n):
+    df = pd.read_csv('../../temptest.txt')
+    daily_high = df['Y'].max()
+    return 'Monthly High: {:.1f}'.format(monthly_high)
+
+@app.callback(Output('daily-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_c(n):
+    df = pd.read_csv('../../temptest.txt')
+    daily_low = df['Y'].min()
+    return 'Monthly Low: {:.1f}'.format(monthly_low)
+
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
