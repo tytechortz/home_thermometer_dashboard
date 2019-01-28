@@ -54,7 +54,7 @@ app.layout = html.Div([
     )]),
     html.Div([
     html.Pre(
-        id='time',
+        id='current-time',
         children='Time:'
     ),
     ])
@@ -113,6 +113,12 @@ def update_graph(n):
 
         )])
     return fig 
+
+@app.callback(Output('current-time', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_f(n):
+    current_time = datetime.datetime.now()
+    return 'Time: {}'.format(current_time)
 
 
 if __name__ == '__main__':
