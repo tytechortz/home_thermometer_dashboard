@@ -5,6 +5,8 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import requests
 import pandas as pd 
+import time
+import datetime
 
 app = dash.Dash(__name__)
 
@@ -50,6 +52,12 @@ app.layout = html.Div([
         interval=60000,
         n_intervals=0
     )]),
+    html.Div([
+    html.Pre(
+        id='time',
+        children='Time:'
+    ),
+    ])
 ])
 
 url = "http://10.0.1.7:8080"
