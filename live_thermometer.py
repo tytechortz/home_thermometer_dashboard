@@ -69,6 +69,13 @@ def update_layout(n):
               [Input('interval-component', 'n_intervals')])
 def update_layout_b(n):
     df = pd.read_csv('../../temptest.txt')
+    df['datetime'] = pd.to_datetime(df['X'])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    td = datetime.date.today().strftime("%d")
+    td = int(td)
+    df = df[df.index.day == td]
     daily_high = df['Y'].max()
     return 'Daily High: {:.1f}'.format(daily_high)
 
@@ -76,6 +83,13 @@ def update_layout_b(n):
               [Input('interval-component', 'n_intervals')])
 def update_layout_c(n):
     df = pd.read_csv('../../temptest.txt')
+    df['datetime'] = pd.to_datetime(df['X'])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    td = datetime.date.today().strftime("%d")
+    td = int(td)
+    df = df[df.index.day == td]
     daily_low = df['Y'].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
 
