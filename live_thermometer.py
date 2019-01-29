@@ -134,6 +134,16 @@ def update_graph(n):
         )])
     return fig 
 
+@app.callback(Output('temp-histogram','figure'),
+              [Input('interval-component', 'n_intervals')])
+def update_graph(n):
+    df = pd.read_csv('../../tempjan19.txt', header=None)
+    fig = go.Figure(
+        data = [go.Histogram(
+            x=df[1]
+        )]
+    )
+
 
 
 if __name__ == '__main__':
