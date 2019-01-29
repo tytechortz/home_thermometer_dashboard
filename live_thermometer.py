@@ -53,6 +53,9 @@ app.layout = html.Div([
         interval=60000,
         n_intervals=0
     )]),
+    html.Div([
+    dcc.Graph(id='temp-histogram',style={'width':600})
+    ])
 ])
 
 url = "http://10.0.1.7:8080"
