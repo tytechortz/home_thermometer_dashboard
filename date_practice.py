@@ -22,5 +22,5 @@ df = df.set_index('datetime')
 df.drop(['X'], axis=1, inplace=True)
 # td = datetime.datetime.today()
 
-print(df.head(5))
+print(df[df.index.day == 27])
 
