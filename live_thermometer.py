@@ -137,10 +137,11 @@ def update_graph(n):
 @app.callback(Output('temp-histogram','figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_a(n):
-    df = pd.read_csv('../../tempjan19.txt', header=None)
+    df = pd.read_csv('../../temptest.txt')
     fig = go.Figure(
         data = [go.Histogram(
-            x=df[1]
+            x=df['Y'],
+            xbins=dict(size=1)
         )])
     return fig
 
