@@ -20,7 +20,11 @@ df = pd.read_csv('../../temptest.txt')
 df['datetime'] = pd.to_datetime(df['X'])
 df = df.set_index('datetime')
 df.drop(['X'], axis=1, inplace=True)
-# td = datetime.datetime.today()
 
-print(df[df.index.day == 27])
+td = datetime.date.today().strftime("%d")
+
+# print(datetime.date.today().strftime("%d"))
+td = int(td)
+print(td)
+print(df[df.index.day == td])
 
