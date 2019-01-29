@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from dateutil.relativedelta import relativedelta
 import plotly.graph_objs as go
 import requests
 import pandas as pd 
@@ -102,9 +103,12 @@ def update_layout_e(n):
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
     df = pd.read_csv('../../temptest.txt')
+    df.index = pd.to_datetime(df.index)
+    today = df.datetime.today()
+    now = df.datetime.now()
     fig = go.Figure(
         data = [go.Scatter(
-            x = df['X'],
+            x = df.loc[df['X'].between(today, now)],
             y = df['Y'],
             mode = 'markers+lines',
             marker=dict(
