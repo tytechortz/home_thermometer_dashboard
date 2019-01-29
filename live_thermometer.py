@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 import plotly.graph_objs as go
 import requests
 import pandas as pd 
@@ -53,12 +53,6 @@ app.layout = html.Div([
         interval=60000,
         n_intervals=0
     )]),
-    html.Div([
-    html.Pre(
-        id='current-time',
-        children='Time:'
-    ),
-    ])
 ])
 
 url = "http://10.0.1.7:8080"
@@ -68,7 +62,7 @@ url = "http://10.0.1.7:8080"
 def update_layout(n):
     res = requests.get(url)
     data = res.json()
-    f = (9/5) * data + 32
+    f = ((9.0/5.0) * data) + 32
     return 'Current Temperature: {:.1f}'.format(f)
 
 @app.callback(Output('daily-high', 'children'),
@@ -103,12 +97,17 @@ def update_layout_e(n):
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
     df = pd.read_csv('../../temptest.txt')
-    df.index = pd.to_datetime(df.index)
-    today = df.datetime.today()
-    now = df.datetime.now()
+    df['datetime'] = pd.to_datetime(df['X'])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    td = datetime.date.today().strftime("%d")
+    td = int(td)
+    df = df[df.index.day == td]
+
     fig = go.Figure(
         data = [go.Scatter(
-            x = df.loc[df['X'].between(today, now)],
+            x = df['X'],
             y = df['Y'],
             mode = 'markers+lines',
             marker=dict(
@@ -118,12 +117,7 @@ def update_graph(n):
         )])
     return fig 
 
-@app.callback(Output('current-time', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_f(n):
-    current_time = datetime.datetime.now()
-    return 'Time: {}'.format(current_time)
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
