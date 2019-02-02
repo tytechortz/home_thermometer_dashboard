@@ -26,12 +26,12 @@ app.layout = html.Div([
         children='Current Temperature:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':20},
+        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='daily-high',
         children='Daily High:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':20},
+        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='daily-low',
         children='Daily Low:'
     ),
