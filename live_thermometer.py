@@ -80,19 +80,18 @@ def update_layout(n):
     f = ((9.0/5.0) * data) + 32
     return 'Current Temperature: {:.1f}'.format(f)
 
-# @app.callback(Output('daily-high', 'children'),
-#               [Input('interval-component', 'n_intervals')])
-# def update_layout_b(n):
-#     df = pd.read_csv('../../temptest.txt')
-#     df['datetime'] = pd.to_datetime(df['X'])
-#     df = df.set_index('datetime')
-#     # df.drop(['X'], axis=1, inplace=True)
+@app.callback(Output('daily-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_b(n):
+    df = pd.read_csv('../../temptest.txt')
+    df['datetime'] = pd.to_datetime(df['X'])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
 
-#     td = datetime.date.today().strftime("%d")
-#     td = int(td)
-#     df = df[df.index.day == td]
-#     daily_high = df['Y'].max()
-#     return 'Daily High: {:.1f}'.format(daily_high)
+    td = datetime.now().day
+    df = df[df.index.day == td]
+    daily_high = df['Y'].max()
+    return 'Daily High: {:.1f}'.format(daily_high)
 
 @app.callback(Output('daily-low', 'children'),
               [Input('interval-component', 'n_intervals')])
