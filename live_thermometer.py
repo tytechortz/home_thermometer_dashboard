@@ -36,12 +36,12 @@ app.layout = html.Div([
         children='Daily Low:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':15},
+        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='monthly-high',
         children='Monthly High:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':15},
+        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='monthly-low',
         children='Monthly Low:'
     ),
