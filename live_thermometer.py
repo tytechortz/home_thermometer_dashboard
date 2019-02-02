@@ -12,7 +12,7 @@ from datetime import datetime
 
 app = dash.Dash(__name__)
 
-df = pd.read_csv('../../temptest.txt')
+df = pd.read_csv('../../tempjan19.csv')
 
 colors = {
          'background': '#0000FF',
@@ -66,7 +66,11 @@ app.layout = html.Div([
         n_intervals=0
     )]),
     html.Div([
-    dcc.Graph(id='temp-histogram',style={'width':600})
+    dcc.Graph(
+        id='temp-histogram',
+        style={'width':600},
+        
+        )
     ])
 ])
 
@@ -83,33 +87,37 @@ def update_layout(n):
 @app.callback(Output('daily-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_b(n):
-    df = pd.read_csv('../../temptest.txt')
-    df['datetime'] = pd.to_datetime(df['X'])
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     # df.drop(['X'], axis=1, inplace=True)
 
     td = datetime.now().day
-    df = df[df.index.day == td]
-    daily_high = df['Y'].max()
+    tm = datetime.now().month
+    dfd = df[df.index.day == td]
+    dfmd = dfd[dfd.index.month == tm]
+    daily_high = dfmd[1].max()
     return 'Daily High: {:.1f}'.format(daily_high)
 
 @app.callback(Output('daily-low', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_c(n):
-    df = pd.read_csv('../../temptest.txt')
-    df['datetime'] = pd.to_datetime(df['X'])
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     # df.drop(['X'], axis=1, inplace=True)
 
     td = datetime.now().day
-    df = df[df.index.day == td]
-    daily_low = df['Y'].min()
+    tm = datetime.now().month
+    dfd = df[df.index.day == td]
+    dfmd = dfd[dfd.index.month == tm]
+    daily_low = dfmd[1].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
 
 @app.callback(Output('monthly-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_d(n):
-    df = pd.read_csv('../../tempjan19.txt', header=None)
+    df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
 
@@ -123,14 +131,14 @@ def update_layout_d(n):
 @app.callback(Output('monthly-low', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_e(n):
-    df = pd.read_csv('../../tempjan19.txt', header=None)
+    df = pd.read_csv('../../tempjan19.csv', header=None)
     monthly_low = df[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
-    df = pd.read_csv('../../tempjan19.txt',header=None)
+    df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     # df.drop(['X'], axis=1, inplace=True)
@@ -141,25 +149,40 @@ def update_graph(n):
     dfmd = dfd[dfd.index.month == tm]
     # df = df[df.index.day == td and df.index.month == tm]
 
-    fig = go.Figure(
-        data = [go.Scatter(
+    return {
+        'data': [go.Scatter(
             x = dfmd[0],
             y = dfmd[1],
             mode = 'markers+lines',
-            marker=dict(
+            marker = dict(
                 color = 'orange',
-            ),
+            ), 
+        )],
+        'layout': go.Layout(
+            xaxis=dict(
+                tickformat='%H'
+            )
+        ),
+    }
 
-        )])
-    return fig 
+    # fig = go.Figure(
+    #     data = [go.Scatter(
+    #         x = dfmd[0],
+    #         y = dfmd[1],
+    #         mode = 'markers+lines',
+    #         marker = dict(
+    #             color = 'orange',
+    #         ),  
+    #     )])
+    # return fig 
 
 @app.callback(Output('temp-histogram','figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_a(n):
-    df = pd.read_csv('../../temptest.txt')
+    df = pd.read_csv('../../tempjan19.csv',header=None)
     fig = go.Figure(
         data = [go.Histogram(
-            x=df['Y'],
+            x=df[1],
             xbins=dict(size=1)
         )])
     return fig
