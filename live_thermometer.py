@@ -7,7 +7,8 @@ import plotly.graph_objs as go
 import requests
 import pandas as pd 
 import time
-import datetime
+# import datetime
+from datetime import datetime
 
 app = dash.Dash(__name__)
 
@@ -79,19 +80,19 @@ def update_layout(n):
     f = ((9.0/5.0) * data) + 32
     return 'Current Temperature: {:.1f}'.format(f)
 
-@app.callback(Output('daily-high', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_b(n):
-    df = pd.read_csv('../../temptest.txt')
-    df['datetime'] = pd.to_datetime(df['X'])
-    df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
+# @app.callback(Output('daily-high', 'children'),
+#               [Input('interval-component', 'n_intervals')])
+# def update_layout_b(n):
+#     df = pd.read_csv('../../temptest.txt')
+#     df['datetime'] = pd.to_datetime(df['X'])
+#     df = df.set_index('datetime')
+#     # df.drop(['X'], axis=1, inplace=True)
 
-    td = datetime.date.today().strftime("%d")
-    td = int(td)
-    df = df[df.index.day == td]
-    daily_high = df['Y'].max()
-    return 'Daily High: {:.1f}'.format(daily_high)
+#     td = datetime.date.today().strftime("%d")
+#     td = int(td)
+#     df = df[df.index.day == td]
+#     daily_high = df['Y'].max()
+#     return 'Daily High: {:.1f}'.format(daily_high)
 
 @app.callback(Output('daily-low', 'children'),
               [Input('interval-component', 'n_intervals')])
@@ -101,8 +102,8 @@ def update_layout_c(n):
     df = df.set_index('datetime')
     # df.drop(['X'], axis=1, inplace=True)
 
-    td = datetime.date.today().strftime("%d")
-    td = int(td)
+    td = datetime.now().day
+    print(td)
     df = df[df.index.day == td]
     daily_low = df['Y'].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
@@ -111,6 +112,13 @@ def update_layout_c(n):
               [Input('interval-component', 'n_intervals')])
 def update_layout_d(n):
     df = pd.read_csv('../../tempjan19.txt', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+
+    td = datetime.now().month
+    td = int(td)
+    df = df[df.index.month == td]
+
     monthly_high = df[1].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
@@ -121,29 +129,29 @@ def update_layout_e(n):
     monthly_low = df[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
-@app.callback(Output('live-update-graph', 'figure'),
-            [Input('interval-component', 'n_intervals')])
-def update_graph(n):
-    df = pd.read_csv('../../temptest.txt')
-    df['datetime'] = pd.to_datetime(df['X'])
-    df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
+# @app.callback(Output('live-update-graph', 'figure'),
+#             [Input('interval-component', 'n_intervals')])
+# def update_graph(n):
+#     df = pd.read_csv('../../temptest.txt')
+#     df['datetime'] = pd.to_datetime(df['X'])
+#     df = df.set_index('datetime')
+#     # df.drop(['X'], axis=1, inplace=True)
 
-    td = datetime.date.today().strftime("%d")
-    td = int(td)
-    df = df[df.index.day == td]
+#     td = datetime.date.today().strftime("%d")
+#     td = int(td)
+#     df = df[df.index.day == td]
 
-    fig = go.Figure(
-        data = [go.Scatter(
-            x = df['X'],
-            y = df['Y'],
-            mode = 'markers+lines',
-            marker=dict(
-                color = 'orange',
-            ),
+#     fig = go.Figure(
+#         data = [go.Scatter(
+#             x = df['X'],
+#             y = df['Y'],
+#             mode = 'markers+lines',
+#             marker=dict(
+#                 color = 'orange',
+#             ),
 
-        )])
-    return fig 
+#         )])
+#     return fig 
 
 @app.callback(Output('temp-histogram','figure'),
               [Input('interval-component', 'n_intervals')])
