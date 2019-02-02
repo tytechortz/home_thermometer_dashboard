@@ -62,7 +62,7 @@ app.layout = html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
     dcc.Interval(
         id='interval-component',
-        interval=60000,
+        interval=900000,
         n_intervals=0
     )]),
     html.Div([
@@ -102,7 +102,6 @@ def update_layout_c(n):
     # df.drop(['X'], axis=1, inplace=True)
 
     td = datetime.now().day
-    print(td)
     df = df[df.index.day == td]
     daily_low = df['Y'].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
@@ -128,29 +127,31 @@ def update_layout_e(n):
     monthly_low = df[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
-# @app.callback(Output('live-update-graph', 'figure'),
-#             [Input('interval-component', 'n_intervals')])
-# def update_graph(n):
-#     df = pd.read_csv('../../temptest.txt')
-#     df['datetime'] = pd.to_datetime(df['X'])
-#     df = df.set_index('datetime')
-#     # df.drop(['X'], axis=1, inplace=True)
+@app.callback(Output('live-update-graph', 'figure'),
+            [Input('interval-component', 'n_intervals')])
+def update_graph(n):
+    df = pd.read_csv('../../tempjan19.txt',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
 
-#     td = datetime.date.today().strftime("%d")
-#     td = int(td)
-#     df = df[df.index.day == td]
+    td = datetime.now().day
+    tm = datetime.now().month
+    dfd = df[df.index.day == td]
+    dfmd = dfd[dfd.index.month == tm]
+    # df = df[df.index.day == td and df.index.month == tm]
 
-#     fig = go.Figure(
-#         data = [go.Scatter(
-#             x = df['X'],
-#             y = df['Y'],
-#             mode = 'markers+lines',
-#             marker=dict(
-#                 color = 'orange',
-#             ),
+    fig = go.Figure(
+        data = [go.Scatter(
+            x = dfmd[0],
+            y = dfmd[1],
+            mode = 'markers+lines',
+            marker=dict(
+                color = 'orange',
+            ),
 
-#         )])
-#     return fig 
+        )])
+    return fig 
 
 @app.callback(Output('temp-histogram','figure'),
               [Input('interval-component', 'n_intervals')])
