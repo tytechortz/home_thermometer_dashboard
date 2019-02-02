@@ -32,19 +32,30 @@ app.layout = html.Div([
     ),
     html.Pre(
         style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        id='monthly-high',
+        children='Monthly High:'
+    ),
+    html.Pre(
+        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        id='yearly-high',
+        children='Yearly High:'
+    ),
+    html.Pre(
+        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='daily-low',
         children='Daily Low:'
     ),
     html.Pre(
         style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
-        id='monthly-high',
-        children='Monthly High:'
-    ),
-    html.Pre(
-        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
         id='monthly-low',
         children='Monthly Low:'
     ),
+    html.Pre(
+        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        id='yearly-low',
+        children='Yearly Low:'
+    ),
+
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
