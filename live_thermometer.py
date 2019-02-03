@@ -64,7 +64,13 @@ app.layout = html.Div([
         id='interval-component',
         interval=900000,
         n_intervals=0
-    )]),
+    ),
+    dcc.Interval(
+        id='interval-component-thermometer',
+        interval=60000,
+        n_intervals=0
+    ),
+    ]),
     html.Div([
     dcc.Graph(
         id='temp-histogram',
@@ -77,7 +83,7 @@ app.layout = html.Div([
 url = "http://10.0.1.7:8080"
 
 @app.callback(Output('live-thermometer', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-thermometer', 'n_intervals')])
 def update_layout(n):
     res = requests.get(url)
     data = res.json()
