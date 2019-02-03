@@ -132,8 +132,46 @@ def update_layout_d(n):
               [Input('interval-component', 'n_intervals')])
 def update_layout_e(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+
+    td = datetime.now().month
+    td = int(td)
+    df = df[df.index.month == td]
+
+
     monthly_low = df[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
+
+@app.callback(Output('yearly-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_f(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    # td = datetime.now().day
+    tm = datetime.now().year
+    dfy = df[df.index.year == tm]
+    dfy = dfy[dfy.index.year == tm]
+    yearly_high = dfy[1].max()
+    return 'Yearly High: {:.1f}'.format(yearly_high)
+
+@app.callback(Output('yearly-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_g(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    # td = datetime.now().day
+    tm = datetime.now().year
+    dfy = df[df.index.year == tm]
+    dfy = dfy[dfy.index.year == tm]
+    yearly_low = dfy[1].min()
+    return 'Yearly Low: {:.1f}'.format(yearly_low)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
@@ -160,26 +198,21 @@ def update_graph(n):
         )],
         'layout': go.Layout(
             xaxis=dict(
-                tickformat='%H'
+                tickformat='%H%M'
             )
         ),
     }
-
-    # fig = go.Figure(
-    #     data = [go.Scatter(
-    #         x = dfmd[0],
-    #         y = dfmd[1],
-    #         mode = 'markers+lines',
-    #         marker = dict(
-    #             color = 'orange',
-    #         ),  
-    #     )])
-    # return fig 
 
 @app.callback(Output('temp-histogram','figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_a(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+
+    td = datetime.now().month
+    td = int(td)
+    df = df[df.index.month == td]
     fig = go.Figure(
         data = [go.Histogram(
             x=df[1],
