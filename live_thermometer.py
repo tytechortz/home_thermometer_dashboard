@@ -252,16 +252,20 @@ def update_graph_a(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
    
-    df_max = df.resample('D').max()
-    print(df_max)
+    # td = datetime.now().day
+    # tm = datetime.now().month
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    
 
 
-    # fig = go.Figure(
-    #     data = [go.Histogram(
-    #         x=df,
-    #         xbins=dict(size=1)
-    #     )])
-    # return fig
+    fig = go.Figure(
+        data = [go.Histogram(
+            x=df_max[1],
+            xbins=dict(size=1)
+        )])
+    return fig
 
 
 
