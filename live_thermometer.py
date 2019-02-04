@@ -110,8 +110,8 @@ def update_layout_b(n):
     td = datetime.now().day
     tm = datetime.now().month
     dfd = df[df.index.day == td]
-    dfmd = dfd[dfd.index.month == tm]
-    daily_high = dfmd[1].max()
+    dfdm = dfd[dfd.index.month == tm]
+    daily_high = dfdm[1].max()
     return 'Daily High: {:.1f}'.format(daily_high)
 
 @app.callback(Output('daily-low', 'children'),
@@ -221,6 +221,7 @@ def update_graph(n):
     # df.drop(['X'], axis=1, inplace=True)
 
     td = datetime.now().day
+    td = int(td)
     tm = datetime.now().month
     ty = datetime.now().year
     dfd = df[df.index.day == td]
@@ -250,16 +251,17 @@ def update_graph_a(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+   
+    
+    print(df.resample('M').max())
 
-    td = datetime.now().month
-    td = int(td)
-    df = df[df.index.month == td]
-    fig = go.Figure(
-        data = [go.Histogram(
-            x=df[1],
-            xbins=dict(size=1)
-        )])
-    return fig
+
+    # fig = go.Figure(
+    #     data = [go.Histogram(
+    #         x=df,
+    #         xbins=dict(size=1)
+    #     )])
+    # return fig
 
 
 
