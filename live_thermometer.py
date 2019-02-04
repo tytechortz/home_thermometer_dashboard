@@ -252,8 +252,8 @@ def update_graph_a(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
    
-    
-    print(df.resample('M').max())
+    df_max = df.resample('D').max()
+    print(df_max)
 
 
     # fig = go.Figure(
