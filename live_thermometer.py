@@ -27,36 +27,45 @@ app.layout = html.Div([
         children='Current Temperature:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='daily-high',
         children='Daily High:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='monthly-high',
         children='Monthly High:'
     ),
     html.Pre(
-        style={'color': 'red', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='yearly-high',
         children='Yearly High:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='record-high',
+        children='Record High:'
+    ),
+    html.Pre(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='daily-low',
         children='Daily Low:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='monthly-low',
         children='Monthly Low:'
     ),
     html.Pre(
-        style={'color': 'blue', 'font-size':20, 'width': '31%', 'display':'inline-block'},
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='yearly-low',
         children='Yearly Low:'
     ),
-
+    html.Pre(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='record-low',
+        children='Record Low:'
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
@@ -115,9 +124,11 @@ def update_layout_c(n):
 
     td = datetime.now().day
     tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == td]
-    dfmd = dfd[dfd.index.month == tm]
-    daily_low = dfmd[1].min()
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+    daily_low = dfdmy[1].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
 
 @app.callback(Output('monthly-high', 'children'),
@@ -127,11 +138,12 @@ def update_layout_d(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
 
-    td = datetime.now().month
-    td = int(td)
-    df = df[df.index.month == td]
+    tm = datetime.now().month
+    ty = datetime.now().year
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
 
-    monthly_high = df[1].max()
+    monthly_high = dfmy[1].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
 @app.callback(Output('monthly-low', 'children'),
@@ -141,12 +153,13 @@ def update_layout_e(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
 
-    td = datetime.now().month
-    td = int(td)
-    df = df[df.index.month == td]
+    tm = datetime.now().month
+    ty = datetime.now().year
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
 
 
-    monthly_low = df[1].min()
+    monthly_low = dfmy[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
 @app.callback(Output('yearly-high', 'children'),
@@ -179,6 +192,21 @@ def update_layout_g(n):
     yearly_low = dfy[1].min()
     return 'Yearly Low: {:.1f}'.format(yearly_low)
 
+@app.callback(Output('record-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_f(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # df.drop(['X'], axis=1, inplace=True)
+
+    # td = datetime.now().day
+    # tm = datetime.now().year
+    # dfy = df[df.index.year == tm]
+    # dfy = dfy[dfy.index.year == tm]
+    record_high = df[1].max()
+    return 'Record High: {:.1f}'.format(record_high)
+
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
@@ -189,14 +217,16 @@ def update_graph(n):
 
     td = datetime.now().day
     tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == td]
-    dfmd = dfd[dfd.index.month == tm]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
     # df = df[df.index.day == td and df.index.month == tm]
 
     return {
         'data': [go.Scatter(
-            x = dfmd[0],
-            y = dfmd[1],
+            x = dfdmy[0],
+            y = dfdmy[1],
             mode = 'markers+lines',
             marker = dict(
                 color = 'orange',
