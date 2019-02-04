@@ -129,11 +129,12 @@ def update_layout_d(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
 
-    td = datetime.now().month
-    td = int(td)
-    df = df[df.index.month == td]
+    tm = datetime.now().month
+    ty = datetime.now().year
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
 
-    monthly_high = df[1].max()
+    monthly_high = dfmy[1].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
 @app.callback(Output('monthly-low', 'children'),
@@ -143,12 +144,13 @@ def update_layout_e(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
 
-    td = datetime.now().month
-    td = int(td)
-    df = df[df.index.month == td]
+    tm = datetime.now().month
+    ty = datetime.now().year
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
 
 
-    monthly_low = df[1].min()
+    monthly_low = dfmy[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
 @app.callback(Output('yearly-high', 'children'),
