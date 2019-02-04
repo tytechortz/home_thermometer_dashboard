@@ -194,18 +194,23 @@ def update_layout_g(n):
 
 @app.callback(Output('record-high', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_f(n):
+def update_layout_h(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
 
-    # td = datetime.now().day
-    # tm = datetime.now().year
-    # dfy = df[df.index.year == tm]
-    # dfy = dfy[dfy.index.year == tm]
     record_high = df[1].max()
     return 'Record High: {:.1f}'.format(record_high)
+
+@app.callback(Output('record-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_i(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+
+    record_low = df[1].min()
+    return 'Record Low: {:.1f}'.format(record_low)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
