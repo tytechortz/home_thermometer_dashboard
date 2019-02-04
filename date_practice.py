@@ -115,9 +115,11 @@ def update_layout_c(n):
 
     td = datetime.now().day
     tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == td]
-    dfmd = dfd[dfd.index.month == tm]
-    daily_low = dfmd[1].min()
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+    daily_low = dfdmy[1].min()
     return 'Daily Low: {:.1f}'.format(daily_low)
 
 @app.callback(Output('monthly-high', 'children'),
