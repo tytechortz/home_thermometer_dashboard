@@ -28,60 +28,90 @@ colors = {
 
 app.layout = html.Div([
     html.Div([
-    html.Pre(
+    html.Div(
         style={'color': 'green', 'font-size':35},
         id='live-thermometer',
         children='Current Temperature:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='daily-high',
         children='Daily High:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='monthly-high',
         children='Monthly High:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='yearly-high',
         children='Yearly High:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='record-high',
         children='Record High:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='daily-low',
         children='Daily Low:'
     ),
-    html.Pre(
+    html.Div(
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='monthly-high-date',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='yearly-high-date',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='record-high-date',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='yesterday-high',
+        children="Yesterday's High:"
+    ),
+    html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='monthly-low',
         children='Monthly Low:'
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='yearly-low',
-        children='Yearly Low:'
+        children="Yearly Low:"
     ),
-    html.Pre(
+    html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='record-low',
         children='Record Low:'
     ),
-    html.Pre(
-        style={'color': 'red', 'font-size':20, 'width': '100%', 'display':'inline-block'},
-        id='yesterday-high',
-        children="Yesterday's High:"
-    ),
-    html.Pre(
+    html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='yesterday-low',
         children="Yesterday's Low:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='monthly-low-date',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='yearly-low-date',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='record-low-date',
+        children=''
     ),
     ]),
     html.Div([
@@ -147,7 +177,6 @@ def update_layout_d(n):
     df = df.set_index('datetime')
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
-
     monthly_high = dfmy[1].max()
     return 'Monthly High: {:.1f}'.format(monthly_high)
 
@@ -228,6 +257,28 @@ def update_layout_k(n):
 
     yesterday_low = dfdmy[1].min()
     return "Yesterday's Low: {:.1f}".format(yesterday_low)
+
+@app.callback(Output('monthly-high-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_l(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
+    monthly_high_date = dfmy[1].idxmax()
+    return "{}".format(monthly_high_date)
+
+@app.callback(Output('monthly-low-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_e(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    dfm = df[df.index.month == tm]
+    dfmy = dfm[dfm.index.year == ty]
+    monthly_low_date = dfmy[1].idxmin()
+    return '{}'.format(monthly_low_date)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
