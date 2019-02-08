@@ -14,6 +14,13 @@ app = dash.Dash(__name__)
 
 df = pd.read_csv('../../tempjan19.csv')
 
+td = datetime.now().day
+tm = datetime.now().month
+ty = datetime.now().year
+
+tdy = td - 1
+
+
 colors = {
          'background': '#0000FF',
          'color': '#FFA500'
@@ -66,6 +73,16 @@ app.layout = html.Div([
         id='record-low',
         children='Record Low:'
     ),
+    html.Pre(
+        style={'color': 'red', 'font-size':20, 'width': '100%', 'display':'inline-block'},
+        id='yesterday-high',
+        children="Yesterday's High:"
+    ),
+    html.Pre(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='yesterday-low',
+        children="Yesterday's Low:"
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':1200}),
@@ -105,10 +122,6 @@ def update_layout_b(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
-
-    td = datetime.now().day
-    tm = datetime.now().month
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     daily_high = dfdm[1].max()
@@ -120,11 +133,6 @@ def update_layout_c(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
-
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
@@ -137,9 +145,6 @@ def update_layout_d(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-
-    tm = datetime.now().month
-    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
 
@@ -152,13 +157,8 @@ def update_layout_e(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-
-    tm = datetime.now().month
-    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
-
-
     monthly_low = dfmy[1].min()
     return 'Monthly Low: {:.1f}'.format(monthly_low)
 
@@ -168,12 +168,8 @@ def update_layout_f(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
-
-    # td = datetime.now().day
-    tm = datetime.now().year
-    dfy = df[df.index.year == tm]
-    dfy = dfy[dfy.index.year == tm]
+    dfy = df[df.index.year == ty]
+    # dfy = dfy[dfy.index.year == tm]
     yearly_high = dfy[1].max()
     return 'Yearly High: {:.1f}'.format(yearly_high)
 
@@ -183,12 +179,8 @@ def update_layout_g(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    # df.drop(['X'], axis=1, inplace=True)
-
-    # td = datetime.now().day
-    tm = datetime.now().year
-    dfy = df[df.index.year == tm]
-    dfy = dfy[dfy.index.year == tm]
+    dfy = df[df.index.year == ty]
+    # dfy = dfy[dfy.index.year == tm]
     yearly_low = dfy[1].min()
     return 'Yearly Low: {:.1f}'.format(yearly_low)
 
@@ -212,6 +204,31 @@ def update_layout_i(n):
     record_low = df[1].min()
     return 'Record Low: {:.1f}'.format(record_low)
 
+@app.callback(Output('yesterday-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_j(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    dfd = df[df.index.day == tdy]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+    yesterday_high = dfdmy[1].max()
+    return "Yesterday's High: {:.1f}".format(yesterday_high)
+
+@app.callback(Output('yesterday-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_k(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    dfd = df[df.index.day == tdy]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+
+    yesterday_low = dfdmy[1].min()
+    return "Yesterday's Low: {:.1f}".format(yesterday_low)
+
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
@@ -219,11 +236,6 @@ def update_graph(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     # df.drop(['X'], axis=1, inplace=True)
-
-    td = datetime.now().day
-    td = int(td)
-    tm = datetime.now().month
-    ty = datetime.now().year
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
@@ -251,9 +263,6 @@ def update_graph_a(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-   
-    # td = datetime.now().day
-    # tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
@@ -263,7 +272,7 @@ def update_graph_a(n):
     fig = go.Figure(
         data = [go.Histogram(
             x=df_max[1],
-            xbins=dict(size=1)
+            xbins=dict(size=10)
         )])
     return fig
 
