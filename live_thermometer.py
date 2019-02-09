@@ -285,7 +285,7 @@ def update_layout_m(n):
 
 @app.callback(Output('yearly-high-date', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_l(n):
+def update_layout_n(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
@@ -293,6 +293,17 @@ def update_layout_l(n):
     dfy = df[df.index.year == ty]
     yearly_high_date = dfy[1].idxmax()
     return "{}".format(yearly_high_date)
+
+@app.callback(Output('yearly-low-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_o(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # dfm = df[df.index.month == tm]
+    dfy = df[df.index.year == ty]
+    yearly_low_date = dfy[1].idxmin()
+    return '{}'.format(yearly_low_date)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
