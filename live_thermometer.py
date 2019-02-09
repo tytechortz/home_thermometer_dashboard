@@ -163,6 +163,9 @@ def update_layout_c(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
@@ -271,7 +274,7 @@ def update_layout_l(n):
 
 @app.callback(Output('monthly-low-date', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_e(n):
+def update_layout_m(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
@@ -279,6 +282,17 @@ def update_layout_e(n):
     dfmy = dfm[dfm.index.year == ty]
     monthly_low_date = dfmy[1].idxmin()
     return '{}'.format(monthly_low_date)
+
+@app.callback(Output('yearly-high-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_l(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    # dfm = df[df.index.month == tm]
+    dfy = df[df.index.year == ty]
+    yearly_high_date = dfy[1].idxmax()
+    return "{}".format(yearly_high_date)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
@@ -291,7 +305,6 @@ def update_graph(n):
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
     # df = df[df.index.day == td and df.index.month == tm]
-
     return {
         'data': [go.Scatter(
             x = dfdmy[0],

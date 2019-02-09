@@ -6,3 +6,7 @@ Div {
     color: red;
     font-size: 40px
 }
+
+.point {
+    fill: blueviolet
+}
