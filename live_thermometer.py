@@ -21,6 +21,8 @@ ty = datetime.now().year
 tdy = td - 1
 
 
+cdaf = 0
+
 colors = {
          'background': '#0000FF',
          'color': '#FFA500'
@@ -131,9 +133,18 @@ app.layout = html.Div([
     dcc.Graph(
         id='temp-histogram',
         style={'width':600},
-        
         )
-    ])
+    ]),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='cons-days-over-32',
+        children="Consecutive Days Above Freezing:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='total-days-over-32',
+        children="Total Days Above Freezing:"
+    )
 ])
 
 url = "http://10.0.1.7:8080"
@@ -152,9 +163,13 @@ def update_layout_b(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
-    daily_high = dfdm[1].max()
+    dfdmy = dfdm[dfdm.index.year == ty]
+    daily_high = dfdmy[1].max()
     return 'Daily High: {:.1f}'.format(daily_high)
 
 @app.callback(Output('daily-low', 'children'),
@@ -178,6 +193,9 @@ def update_layout_d(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
     monthly_high = dfmy[1].max()
@@ -189,6 +207,9 @@ def update_layout_e(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
     monthly_low = dfmy[1].min()
@@ -200,6 +221,9 @@ def update_layout_f(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfy = df[df.index.year == ty]
     # dfy = dfy[dfy.index.year == tm]
     yearly_high = dfy[1].max()
@@ -211,6 +235,9 @@ def update_layout_g(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfy = df[df.index.year == ty]
     # dfy = dfy[dfy.index.year == tm]
     yearly_low = dfy[1].min()
@@ -222,7 +249,9 @@ def update_layout_h(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     record_high = df[1].max()
     return 'Record High: {:.1f}'.format(record_high)
 
@@ -232,7 +261,9 @@ def update_layout_i(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     record_low = df[1].min()
     return 'Record Low: {:.1f}'.format(record_low)
 
@@ -242,6 +273,10 @@ def update_layout_j(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tdy = td - 1
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == tdy]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
@@ -254,6 +289,10 @@ def update_layout_k(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tdy = td - 1
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfd = df[df.index.day == tdy]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
@@ -267,6 +306,9 @@ def update_layout_l(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
     monthly_high_date = dfmy[1].idxmax()
@@ -278,6 +320,9 @@ def update_layout_m(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     dfm = df[df.index.month == tm]
     dfmy = dfm[dfm.index.year == ty]
     monthly_low_date = dfmy[1].idxmin()
@@ -289,6 +334,9 @@ def update_layout_n(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     # dfm = df[df.index.month == tm]
     dfy = df[df.index.year == ty]
     yearly_high_date = dfy[1].idxmax()
@@ -300,6 +348,9 @@ def update_layout_o(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     # dfm = df[df.index.month == tm]
     dfy = df[df.index.year == ty]
     yearly_low_date = dfy[1].idxmin()
@@ -311,14 +362,20 @@ def update_layout_p(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     record_high_date = df[1].idxmax()
-    return "{}".format(record_high_date)
+    return '{}'.format(record_high_date)
 
 @app.callback(Output('record-low-date', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_p(n):
+def update_layout_q(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     df = df.set_index('datetime')
     record_low_date = df[1].idxmin()
     return '{}'.format(record_low_date)
@@ -329,6 +386,9 @@ def update_graph(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     # df.drop(['X'], axis=1, inplace=True)
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
@@ -356,12 +416,13 @@ def update_graph_a(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
     
-
-
     fig = go.Figure(
         data = [go.Histogram(
             x=df_max[1],
@@ -369,6 +430,41 @@ def update_graph_a(n):
         )])
     return fig
 
+@app.callback(Output('cons-days-over-32', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_r(n):
+    cdaf = 0
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    dfd = df[df.index.day == td]
+    dfdm = dfd[dfd.index.month == tm]
+    daily_high = dfdm[1].max()
+    if daily_high > 32:
+        cdaf += 1
+    else:
+        cdaf = 0
+    return 'Consecutive Days Above Freezing = {}'.format(cdaf)
+
+@app.callback(Output('total-days-over-32', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_s(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    total_days_over_freezing = (df_max[df_max[1] > 32].count()[1])
+    
+
+    return 'Total Days Above Freezing = {}'.format(total_days_over_freezing)
 
 
 
