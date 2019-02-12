@@ -144,7 +144,27 @@ app.layout = html.Div([
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='total-days-over-32',
         children="Total Days Above Freezing:"
-    )
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='total-days-over-40',
+        children="Total Days Above 40:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='total-days-over-50',
+        children="Total Days Above 50:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='total-days-over-60',
+        children="Total Days Above 60:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='total-days-over-70',
+        children="Total Days Above 70:"
+    ),
 ])
 
 url = "http://10.0.1.7:8080"
@@ -461,12 +481,69 @@ def update_layout_s(n):
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
-    total_days_over_freezing = (df_max[df_max[1] > 32].count()[1])
-    
+    days_over_freezing = (df_max[df_max[1] > 32].count()[1])
 
-    return 'Total Days Above Freezing = {}'.format(total_days_over_freezing)
+    return 'Total Days Above Freezing = {}'.format(days_over_freezing)
 
+@app.callback(Output('total-days-over-40', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_s(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_over_40 = (df_max[df_max[1] >= 40].count()[1])
+    return 'Total Days Above 40 = {}'.format(days_over_40)
 
+@app.callback(Output('total-days-over-50', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_s(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_over_50 = (df_max[df_max[1] >= 50].count()[1])
+    return 'Total Days Above 50 = {}'.format(days_over_50)
+
+@app.callback(Output('total-days-over-60', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_s(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_over_60 = (df_max[df_max[1] >= 60].count()[1])
+    return 'Total Days Above 60 = {}'.format(days_over_60)
+
+@app.callback(Output('total-days-over-70', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_s(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    td = datetime.now().day
+    tm = datetime.now().month
+    ty = datetime.now().year
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_over_70 = (df_max[df_max[1] >= 70].count()[1])
+    return 'Total Days Above 70 = {}'.format(days_over_70)
 
 if __name__ == '__main__':
     app.run_server()
