@@ -458,12 +458,13 @@ def update_layout_r(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     td = datetime.now().day
+    tdy = td - 1
     tm = datetime.now().month
     ty = datetime.now().year
-    dfd = df[df.index.day == td]
+    dfd = df[df.index.day == tdy]
     dfdm = dfd[dfd.index.month == tm]
-    daily_high = dfdm[1].max()
-    if daily_high > 32:
+    yest_daily_high = dfdm[1].max()
+    if yest_daily_high > 32:
         cdaf += 1
     else:
         cdaf = 0
@@ -487,7 +488,7 @@ def update_layout_s(n):
 
 @app.callback(Output('total-days-over-40', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_s(n):
+def update_layout_t(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
@@ -502,7 +503,7 @@ def update_layout_s(n):
 
 @app.callback(Output('total-days-over-50', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_s(n):
+def update_layout_u(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
@@ -517,7 +518,7 @@ def update_layout_s(n):
 
 @app.callback(Output('total-days-over-60', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_s(n):
+def update_layout_v(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
@@ -532,7 +533,7 @@ def update_layout_s(n):
 
 @app.callback(Output('total-days-over-70', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_s(n):
+def update_layout_w(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
