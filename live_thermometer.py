@@ -489,14 +489,31 @@ def update_graph_a(n):
     td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
+    tly = ty - 1
     dfy = df[df.index.year == ty]
-    df_max = dfy.resample('D').max()
+    dfly = df[df.index.year == tly]
+    df_max1 = dfy.resample('D').max()
+    df_max2 = dfly.resample('D').max()
+    print(df_max1)
+    print(df_max2)
+
+    trace2 = go.Histogram(
+        x=df_max1[1],
+        opacity=0.55,
+        xbins=dict(size=10)
+    )
     
+    trace1 = go.Histogram(
+        x=df_max2[1],
+        opacity=0.55,
+        xbins=dict(size=10)
+    )
+    data = [trace1, trace2]
+
     fig = go.Figure(
-        data = [go.Histogram(
-            x=df_max[1],
-            xbins=dict(size=10)
-        )])
+        data = data,
+        layout = go.Layout(barmode='overlay')
+        )
     return fig
 
 @app.callback(Output('high-below-freezing', 'children'),
