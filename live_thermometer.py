@@ -137,8 +137,8 @@ app.layout = html.Div([
     ]),
     html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='cons-days-over-32',
-        children="Consecutive Days Above Freezing:"
+        id='high-below-freezing',
+        children="Days High Below Freezing:"
     ),
     html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
@@ -450,25 +450,21 @@ def update_graph_a(n):
         )])
     return fig
 
-@app.callback(Output('cons-days-over-32', 'children'),
+@app.callback(Output('high-below-freezing', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_r(n):
-    cdaf = 0
-    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     td = datetime.now().day
-    tdy = td - 1
     tm = datetime.now().month
     ty = datetime.now().year
-    dfd = df[df.index.day == tdy]
-    dfdm = dfd[dfd.index.month == tm]
-    yest_daily_high = dfdm[1].max()
-    if yest_daily_high > 32:
-        cdaf += 1
-    else:
-        cdaf = 0
-    return 'Consecutive Days Above Freezing = {}'.format(cdaf)
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_below_freezing = (df_max[df_max[1] < 32].count()[1])
+
+    return 'Total Days High Below Freezing= {}'.format(days_below_freezing)
 
 @app.callback(Output('total-days-over-32', 'children'),
               [Input('interval-component', 'n_intervals')])
