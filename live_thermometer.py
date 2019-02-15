@@ -12,16 +12,20 @@ from datetime import datetime
 
 app = dash.Dash(__name__)
 
-df = pd.read_csv('../../tempjan19.csv')
+df2 = pd.read_csv('../../2018_temps.csv', header=None)
+df2['datetime'] = pd.to_datetime(df2[0])
+df2 = df2.set_index('datetime')
+df3 = df2.resample('D').max()
+df4 = df2.resample('D').min()
+ly_days_over_90 = (df3[df3[1] >= 90].count()[1])
+ly_days_over_80 = (df3[df3[1] >= 80].count()[1])
+ly_days_over_70 = (df3[df3[1] >= 70].count()[1])
+ly_days_over_60 = (df3[df3[1] >= 60].count()[1])
+ly_days_over_50 = (df3[df3[1] >= 50].count()[1])
+ly_days_over_40 = (df3[df3[1] >= 40].count()[1])
+ly_days_over_freezing = (df3[df3[1] > 32].count()[1])
+ly_days_below_freezing = (df3[df3[1] < 32].count()[1])
 
-td = datetime.now().day
-tm = datetime.now().month
-ty = datetime.now().year
-
-tdy = td - 1
-
-
-cdaf = 0
 
 colors = {
          'background': '#0000FF',
@@ -128,11 +132,20 @@ app.layout = html.Div([
         interval=60000,
         n_intervals=0
     ),
+    dcc.Interval(
+        id='interval-component-counts',
+        interval=3600000, 
+        n_intervals=0
+    ),
     ]),
     html.Div([
     dcc.Graph(
-        id='temp-histogram',
-        style={'width':600},
+        id='temp-histogram-max',
+        style={'width':600, 'display':'inline-block'},
+        ),
+    dcc.Graph(
+        id='temp-histogram-min',
+        style={'width':600, 'display':'inline-block', 'float': 'right'},
         )
     ]),
     html.Div(
@@ -155,35 +168,27 @@ app.layout = html.Div([
         id='days-over-50',
         children="Days Above 50:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_below_freezing)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-high-below-freezing',
-        children="Last Year:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_freezing)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-32',
-        children="Last Year:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_40)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-40',
-        children="Last Year:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_50)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-50',
-        children="Last Year:"
     ),
     html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='total-days-over-60',
-        children="Total Days Above 60:"
+        children="Days Above 60:"
     ),
     html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
         id='total-days-over-70',
-        children="Total Days Above 70:"
+        children="Days Above 70:"
     ),
      html.Div(
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
@@ -195,67 +200,44 @@ app.layout = html.Div([
         id='days-over-90',
         children="Days Above 90:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_60)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-60',
-        children="Last Year Days Above 60:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_70)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-70',
-        children="Last Year Days Above 70:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_80)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-80',
-        children="Last Year Days Above 80:"
     ),
-    html.Div(
+    html.Div(['Last Year = {}'.format(ly_days_over_90)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
-        id='ly-days-over-90',
-        children="Last Year Days Above 90:"
     ),
-])
+])    
 
 url = "http://10.0.1.7:8080"
 
-@app.callback(Output('live-thermometer', 'children'),
-              [Input('interval-component-thermometer', 'n_intervals')])
-def update_layout(n):
-    res = requests.get(url)
-    data = res.json()
-    f = ((9.0/5.0) * data) + 32
-    return 'Current Temperature: {:.1f}'.format(f)
 
-@app.callback(Output('daily-high', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_b(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    dfd = df[df.index.day == td]
-    dfdm = dfd[dfd.index.month == tm]
-    dfdmy = dfdm[dfdm.index.year == ty]
-    daily_high = dfdmy[1].max()
-    return 'Daily High: {:.1f}'.format(daily_high)
 
-@app.callback(Output('daily-low', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_c(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    dfd = df[df.index.day == td]
-    dfdm = dfd[dfd.index.month == tm]
-    dfdmy = dfdm[dfdm.index.year == ty]
-    daily_low = dfdmy[1].min()
-    return 'Daily Low: {:.1f}'.format(daily_low)
+
+# @app.callback(
+#     Output('intermediate-value', 'children'),
+#     [Input('interval-component', 'value')])
+# def clean_data(value):
+#     df = pd.read_csv('../../tempjan19.csv', header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     td = datetime.now().day
+#     tm = datetime.now().month
+#     ty = datetime.now().year
+#     dfd = df[df.index.day == td]
+#     dfdm = dfd[dfd.index.month == tm]
+#     dfdmy = dfdm[dfdm.index.year == ty]
+
+#     datasets = {
+
+#     }
+
+
 
 @app.callback(Output('monthly-high', 'children'),
               [Input('interval-component', 'n_intervals')])
@@ -263,7 +245,6 @@ def update_layout_d(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
     dfm = df[df.index.month == tm]
@@ -277,7 +258,6 @@ def update_layout_e(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
     dfm = df[df.index.month == tm]
@@ -291,11 +271,8 @@ def update_layout_f(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
-    # dfy = dfy[dfy.index.year == tm]
     yearly_high = dfy[1].max()
     return 'Yearly High: {:.1f}'.format(yearly_high)
 
@@ -305,11 +282,8 @@ def update_layout_g(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
-    # dfy = dfy[dfy.index.year == tm]
     yearly_low = dfy[1].min()
     return 'Yearly Low: {:.1f}'.format(yearly_low)
 
@@ -319,9 +293,6 @@ def update_layout_h(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
     record_high = df[1].max()
     return 'Record High: {:.1f}'.format(record_high)
 
@@ -331,9 +302,6 @@ def update_layout_i(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
     record_low = df[1].min()
     return 'Record Low: {:.1f}'.format(record_low)
 
@@ -376,7 +344,6 @@ def update_layout_l(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
     dfm = df[df.index.month == tm]
@@ -390,7 +357,6 @@ def update_layout_m(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
     dfm = df[df.index.month == tm]
@@ -404,10 +370,7 @@ def update_layout_n(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
-    # dfm = df[df.index.month == tm]
     dfy = df[df.index.year == ty]
     yearly_high_date = dfy[1].idxmax()
     return "{}".format(yearly_high_date)
@@ -418,10 +381,7 @@ def update_layout_o(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
-    # dfm = df[df.index.month == tm]
     dfy = df[df.index.year == ty]
     yearly_low_date = dfy[1].idxmin()
     return '{}'.format(yearly_low_date)
@@ -432,9 +392,6 @@ def update_layout_p(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
     record_high_date = df[1].idxmax()
     return '{}'.format(record_high_date)
 
@@ -443,9 +400,6 @@ def update_layout_p(n):
 def update_layout_q(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
     df = df.set_index('datetime')
     record_low_date = df[1].idxmin()
     return '{}'.format(record_low_date)
@@ -459,11 +413,9 @@ def update_graph(n):
     td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
-    # df.drop(['X'], axis=1, inplace=True)
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty]
-    # df = df[df.index.day == td and df.index.month == tm]
     return {
         'data': [go.Scatter(
             x = dfdmy[0],
@@ -480,22 +432,19 @@ def update_graph(n):
         ),
     }
 
-@app.callback(Output('temp-histogram','figure'),
+@app.callback(Output('temp-histogram-max','figure'),
               [Input('interval-component', 'n_intervals')])
 def update_graph_a(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     tly = ty - 1
     dfy = df[df.index.year == ty]
     dfly = df[df.index.year == tly]
     df_max1 = dfy.resample('D').max()
-    df_max2 = dfly.resample('D').max()
-    print(df_max1)
-    print(df_max2)
+    # df_max2 = df3.resample('D').max()
+   
 
     trace2 = go.Histogram(
         x=df_max1[1],
@@ -504,7 +453,40 @@ def update_graph_a(n):
     )
     
     trace1 = go.Histogram(
-        x=df_max2[1],
+        x=df3[1],
+        opacity=0.55,
+        xbins=dict(size=10)
+    )
+    data = [trace1, trace2]
+
+    fig = go.Figure(
+        data = data,
+        layout = go.Layout(barmode='overlay')
+        )
+    return fig
+
+@app.callback(Output('temp-histogram-min','figure'),
+              [Input('interval-component', 'n_intervals')])
+def update_graph_b(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = datetime.now().year
+    tly = ty - 1
+    dfy = df[df.index.year == ty]
+    dfly = df[df.index.year == tly]
+    df_min1 = dfy.resample('D').min()
+    # df_min2 = df3.resample('D').min()
+   
+
+    trace2 = go.Histogram(
+        x=df_min1[1],
+        opacity=0.55,
+        xbins=dict(size=10)
+    )
+    
+    trace1 = go.Histogram(
+        x=df4[1],
         opacity=0.55,
         xbins=dict(size=10)
     )
@@ -517,13 +499,11 @@ def update_graph_a(n):
     return fig
 
 @app.callback(Output('high-below-freezing', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_r(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
@@ -532,13 +512,11 @@ def update_layout_r(n):
     return 'Days High Below Freezing = {}'.format(days_below_freezing)
 
 @app.callback(Output('days-over-32', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_s(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
@@ -547,13 +525,11 @@ def update_layout_s(n):
     return 'Days Above Freezing = {}'.format(days_over_freezing)
 
 @app.callback(Output('days-over-40', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_t(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
@@ -562,13 +538,11 @@ def update_layout_t(n):
     return 'Days Above 40 = {}'.format(days_over_40)
 
 @app.callback(Output('days-over-50', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_u(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
@@ -576,30 +550,12 @@ def update_layout_u(n):
     days_over_50 = (df_max[df_max[1] >= 50].count()[1])
     return 'Days Above 50 = {}'.format(days_over_50)
 
-@app.callback(Output('ly-days-high-below-freezing', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_v(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_below_freezing = (df_max[df_max[1] < 32].count()[1])
-
-    return 'Last Year = {}'.format(ly_days_below_freezing)
-
 @app.callback(Output('total-days-over-70', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_w(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
@@ -608,13 +564,11 @@ def update_layout_w(n):
     return 'Total Days Above 70 = {}'.format(days_over_70)
 
 @app.callback(Output('total-days-over-60', 'children'),
-              [Input('interval-component', 'n_intervals')])
+              [Input('interval-component-counts', 'n_intervals')])
 def update_layout_x(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
@@ -622,60 +576,12 @@ def update_layout_x(n):
     days_over_60 = (df_max[df_max[1] >= 60].count()[1])
     return 'Total Days Above 60 = {}'.format(days_over_60)
 
-@app.callback(Output('ly-days-over-32', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_s(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_freezing = (df_max[df_max[1] > 32].count()[1])
-
-    return 'Last Year = {}'.format(ly_days_over_freezing)
-
-@app.callback(Output('ly-days-over-40', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_40 = (df_max[df_max[1] >= 40].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_40)
-
-@app.callback(Output('ly-days-over-50', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_50 = (df_max[df_max[1] >= 50].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_50)
-
 @app.callback(Output('days-over-80', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
+              [Input('interval-component-counts', 'n_intervals')])
+def update_layout_bb(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
@@ -683,78 +589,162 @@ def update_layout_x(n):
     return 'Days Above 80 = {}'.format(days_over_80)
 
 @app.callback(Output('days-over-90', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
+              [Input('interval-component-counts', 'n_intervals')])
+def update_layout_cc(n):
     df = pd.read_csv('../../tempjan19.csv',header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
     ty = datetime.now().year
     dfy = df[df.index.year == ty]
     df_max = dfy.resample('D').max()
     days_over_90 = (df_max[df_max[1] >= 90].count()[1])
     return 'Days Above 90 = {}'.format(days_over_90)
 
-@app.callback(Output('ly-days-over-60', 'children'),
+@app.callback(Output('daily-high', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
+def update_layout_b(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_60 = (df_max[df_max[1] >= 60].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_60)
+    dfd = df[df.index.day == td]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+    daily_high = dfdmy[1].max()
+    return 'Daily High: {:.1f}'.format(daily_high)
 
-@app.callback(Output('ly-days-over-70', 'children'),
+@app.callback(Output('daily-low', 'children'),
               [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
+def update_layout_c(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     td = datetime.now().day
     tm = datetime.now().month
     ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_70 = (df_max[df_max[1] >= 70].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_70)
+    dfd = df[df.index.day == td]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty]
+    daily_low = dfdmy[1].min()
+    return 'Daily Low: {:.1f}'.format(daily_low)
 
-@app.callback(Output('ly-days-over-80', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_80 = (df_max[df_max[1] >= 80].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_80)
+@app.callback(Output('live-thermometer', 'children'),
+              [Input('interval-component-thermometer', 'n_intervals')])
+def update_layout(n):
+    res = requests.get(url)
+    data = res.json()
+    f = ((9.0/5.0) * data) + 32
+    return 'Current Temperature: {:.1f}'.format(f)
 
-@app.callback(Output('ly-days-over-90', 'children'),
-              [Input('interval-component', 'n_intervals')])
-def update_layout_x(n):
-    df = pd.read_csv('../../tempjan19.csv',header=None)
-    df['datetime'] = pd.to_datetime(df[0])
-    df = df.set_index('datetime')
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
-    tly = ty - 1
-    dfy = df[df.index.year == tly]
-    df_max = dfy.resample('D').max()
-    ly_days_over_90 = (df_max[df_max[1] >= 90].count()[1])
-    return 'Last Year = {}'.format(ly_days_over_90)
+# @app.callback(Output('ly-days-high-below-freezing', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_v(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_below_freezing = (df_max[df_max[1] < 32].count()[1])
+
+#     return 'Last Year = {}'.format(ly_days_below_freezing)
+
+# @app.callback(Output('ly-days-over-32', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_y(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_freezing = (df_max[df_max[1] > 32].count()[1])
+
+#     return 'Last Year = {}'.format(ly_days_over_freezing)
+
+# @app.callback(Output('ly-days-over-40', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_z(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_40 = (df_max[df_max[1] >= 40].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_40)
+
+# @app.callback(Output('ly-days-over-50', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_aa(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_50 = (df_max[df_max[1] >= 50].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_50)
+
+# @app.callback(Output('ly-days-over-60', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_dd(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_60 = (df_max[df_max[1] >= 60].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_60)
+
+# @app.callback(Output('ly-days-over-70', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_ee(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_70 = (df_max[df_max[1] >= 70].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_70)
+
+# @app.callback(Output('ly-days-over-80', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_ff(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_80 = (df_max[df_max[1] >= 80].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_80)
+
+# @app.callback(Output('ly-days-over-90', 'children'),
+#               [Input('interval-component-last-year', 'n_intervals')])
+# def update_layout_gg(n):
+#     df = pd.read_csv('../../tempjan19.csv',header=None)
+#     df['datetime'] = pd.to_datetime(df[0])
+#     df = df.set_index('datetime')
+#     ty = datetime.now().year
+#     tly = ty - 1
+#     dfy = df[df.index.year == tly]
+#     df_max = dfy.resample('D').max()
+#     ly_days_over_90 = (df_max[df_max[1] >= 90].count()[1])
+#     return 'Last Year = {}'.format(ly_days_over_90)
+
+
 
 if __name__ == '__main__':
     app.run_server()
