@@ -17,6 +17,7 @@ df2['datetime'] = pd.to_datetime(df2[0])
 df2 = df2.set_index('datetime')
 df3 = df2.resample('D').max()
 df4 = df2.resample('D').min()
+
 ly_days_over_90 = (df3[df3[1] >= 90].count()[1])
 ly_days_over_80 = (df3[df3[1] >= 80].count()[1])
 ly_days_over_70 = (df3[df3[1] >= 70].count()[1])
@@ -134,7 +135,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component-counts',
-        interval=3600000, 
+        interval=900000, 
         n_intervals=0
     ),
     ]),
@@ -290,16 +291,17 @@ def update_layout_g(n):
 @app.callback(Output('record-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_h(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df = pd.read_csv('../../alltemps.txt', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     record_high = df[1].max()
+    
     return 'Record High: {:.1f}'.format(record_high)
 
 @app.callback(Output('record-low', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_i(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df = pd.read_csv('../../alltemps.txt', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     record_low = df[1].min()
@@ -389,7 +391,7 @@ def update_layout_o(n):
 @app.callback(Output('record-high-date', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_p(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df = pd.read_csv('../../alltemps.txt', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     record_high_date = df[1].idxmax()
@@ -398,7 +400,7 @@ def update_layout_p(n):
 @app.callback(Output('record-low-date', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_q(n):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df = pd.read_csv('../../alltemps.txt', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     record_low_date = df[1].idxmin()
