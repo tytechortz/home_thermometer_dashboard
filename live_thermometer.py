@@ -122,7 +122,7 @@ app.layout = html.Div([
     ),
     ]),
     html.Div([
-    dcc.Graph(id='live-update-graph',style={'width':1200}),
+    dcc.Graph(id='live-update-graph',style={'width':'70%', 'maxWidth': '1200px'}),
     dcc.Interval(
         id='interval-component',
         interval=900000,
@@ -142,11 +142,11 @@ app.layout = html.Div([
     html.Div([
     dcc.Graph(
         id='temp-histogram-max',
-        style={'width':600, 'display':'inline-block'},
+        style={'width':'45%', 'display':'inline-block'},
         ),
     dcc.Graph(
         id='temp-histogram-min',
-        style={'width':600, 'display':'inline-block', 'float': 'right'},
+        style={'width':'45%', 'display':'inline-block', 'float': 'right'},
         )
     ]),
     html.Div(
