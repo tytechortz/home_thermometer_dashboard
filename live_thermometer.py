@@ -120,6 +120,21 @@ app.layout = html.Div([
         id='record-low-date',
         children=''
     ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-max',
+        children="Average Max:"
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-min',
+        children=''
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-average',
+        children=''
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':'70%', 'maxWidth': '1200px'}),
@@ -405,6 +420,18 @@ def update_layout_q(n):
     df = df.set_index('datetime')
     record_low_date = df[1].idxmin()
     return '{}'.format(record_low_date)
+
+@app.callback(Output('average-max', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_1(n):
+    df = pd.read_csv('../../alltemps.txt', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    dfy = df[df.index.year == ty]
+    average_max = dfy[1].mean()
+    print(average_max)
+    
+    return 'Record High: {:.1f}'.format(record_high)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
