@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 # from dateutil.relativedelta import relativedelta
 import plotly.graph_objs as go
 import requests
-import pandas as pd 
+import pandas as pd
 import time
 # import datetime
 from datetime import datetime
@@ -120,6 +120,21 @@ app.layout = html.Div([
         id='record-low-date',
         children=''
     ),
+    html.Div(
+        style={'color': 'red', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-max',
+        children='Aveage Max:'
+    ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-min',
+        children='Average Min:'
+    ),
+    html.Div(
+        style={'color': 'black', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='average-average',
+        children='Avg Mean:'
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':'70%', 'maxWidth': '1200px'}),
@@ -135,7 +150,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component-counts',
-        interval=900000, 
+        interval=900000,
         n_intervals=0
     ),
     ]),
@@ -213,7 +228,7 @@ app.layout = html.Div([
     html.Div(['Last Year = {}'.format(ly_days_over_90)],
         style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
     ),
-])    
+])
 
 url = "http://10.0.1.7:8080"
 
@@ -295,7 +310,7 @@ def update_layout_h(n):
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
     record_high = df[1].max()
-    
+
     return 'Record High: {:.1f}'.format(record_high)
 
 @app.callback(Output('record-low', 'children'),
@@ -406,6 +421,46 @@ def update_layout_q(n):
     record_low_date = df[1].idxmin()
     return '{}'.format(record_low_date)
 
+@app.callback(Output('average-max', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_1(n):
+    df = pd.read_csv('../../alltemps.txt', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    dfy = dfy.loc[dfy.groupby(pd.Grouper(freq='D')).idxmax().iloc[:,0]]
+    average_max = dfy[1].mean()
+
+
+    return 'Yearly Avg Max: {:.1f}'.format(average_max)
+
+@app.callback(Output('average-min', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_2(n):
+    df = pd.read_csv('../../alltemps.txt', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    dfy = dfy.loc[dfy.groupby(pd.Grouper(freq='D')).idxmin().iloc[:,0]]
+    average_min = dfy[1].mean()
+
+    return 'Yearly Avg Min: {:.1f}'.format(average_min)
+
+@app.callback(Output('average-average', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_3(n):
+    df = pd.read_csv('../../alltemps.txt', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    average_average = dfy[1].mean()
+    print(average_average)
+
+    return 'Yearly Avg Mean: {:.1f}'.format(average_average)
+
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
 def update_graph(n):
@@ -425,7 +480,7 @@ def update_graph(n):
             mode = 'markers+lines',
             marker = dict(
                 color = 'orange',
-            ), 
+            ),
         )],
         'layout': go.Layout(
             xaxis=dict(
@@ -446,14 +501,14 @@ def update_graph_a(n):
     dfly = df[df.index.year == tly]
     df_max1 = dfy.resample('D').max()
     # df_max2 = df3.resample('D').max()
-   
+
 
     trace2 = go.Histogram(
         x=df_max1[1],
         opacity=0.55,
         xbins=dict(size=10)
     )
-    
+
     trace1 = go.Histogram(
         x=df3[1],
         opacity=0.55,
@@ -479,14 +534,14 @@ def update_graph_b(n):
     dfly = df[df.index.year == tly]
     df_min1 = dfy.resample('D').min()
     # df_min2 = df3.resample('D').min()
-   
+
 
     trace2 = go.Histogram(
         x=df_min1[1],
         opacity=0.55,
         xbins=dict(size=10)
     )
-    
+
     trace1 = go.Histogram(
         x=df4[1],
         opacity=0.55,
