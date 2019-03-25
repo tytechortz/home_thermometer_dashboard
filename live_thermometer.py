@@ -427,11 +427,12 @@ def update_layout_1(n):
     df = pd.read_csv('../../alltemps.txt', header=None)
     df['datetime'] = pd.to_datetime(df[0])
     df = df.set_index('datetime')
+    ty = datetime.now().year
     dfy = df[df.index.year == ty]
     average_max = dfy[1].mean()
     print(average_max)
     
-    return 'Record High: {:.1f}'.format(record_high)
+    return 'Yearly Avg Max: {:.1f}'.format(average_max)
 
 @app.callback(Output('live-update-graph', 'figure'),
             [Input('interval-component', 'n_intervals')])
