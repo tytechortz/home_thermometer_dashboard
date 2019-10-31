@@ -33,6 +33,19 @@ colors = {
          'color': '#FFA500'
 }
 
+def cdoe(df3):
+    i = 0
+    x = len(df3)
+    for day in df3:
+        if df3[-x] >= 80:
+            i += 1
+        else:
+            break
+    return i
+
+
+
+
 app.layout = html.Div([
     html.Div([
     html.Div(
@@ -135,6 +148,11 @@ app.layout = html.Div([
         id='average-average',
         children=''
     ),
+    html.Div(
+        style={'color': 'blue', 'font-size':20, 'width': '24%', 'display':'inline-block'},
+        id='streak',
+        children=''
+    ),
     ]),
     html.Div([
     dcc.Graph(id='live-update-graph',style={'width':'70%', 'maxWidth': '1200px'}),
@@ -233,7 +251,16 @@ app.layout = html.Div([
 url = "http://10.0.1.7:8080"
 
 
-
+@app.callback(Output('streak', 'children'),
+              [Input('interval-component-counts', 'n_intervals')])
+def update_layout_r(n):
+    df = pd.read_csv('../../tempjan19.csv',header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = datetime.now().year
+    dfy = df[df.index.year == ty]
+    df_max = dfy.resample('D').max()
+    days_below_freezing = (df_max[df_max[1] < 32].count()[1])
 
 # @app.callback(
 #     Output('intermediate-value', 'children'),
