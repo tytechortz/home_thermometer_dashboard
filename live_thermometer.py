@@ -15,6 +15,7 @@ app = dash.Dash(__name__)
 df2 = pd.read_csv('../../2018_temps.csv', header=None)
 df2['datetime'] = pd.to_datetime(df2[0])
 df2 = df2.set_index('datetime')
+print(df2)
 df3 = df2.resample('D').max()
 df4 = df2.resample('D').min()
 
