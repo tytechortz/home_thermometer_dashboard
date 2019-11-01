@@ -1,5 +1,5 @@
 #!/bin/bash
 
-temp=$(curl http://10.0.1.7.8080)
-tf=$(echo "sale=2;((9/5) * $temp) + 32" | bc)
+temp=$(curl http://10.0.1.7:8080)
+tf=$(echo "scale=2;((9/5) * $temp) + 32" | bc)
 echo $(date '+%Y-%m-%d %H:%M:%S'),$tf >> tempjan19.csv
