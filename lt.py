@@ -50,6 +50,15 @@ def get_layout():
                     ],
                         className='row'
                     ),
+                    html.Div([
+                        html.Div([
+                            html.Div(id='daily-low', style={'color':'blue'})
+                        ],
+                            className='round1'
+                        ),
+                    ],
+                        className='row'
+                    ),
                 ],
                 className='four columns'
                 ),
@@ -73,15 +82,17 @@ app.config['suppress_callback_exceptions']=True
 #     if value == 'live-graph':
 #         return dcc.Graph(id='live-graph')
 
-@app.callback(
+@app.callback([
     Output('daily-high', 'children'),
+    Output('daily-low', 'children')],
     [Input('interval-component', 'n_intervals'),
     Input('daily-data', 'children')])
 def update_daily_stats(n, daily_data):
     daily_df = pd.read_json(daily_data)
     daily_max = daily_df[1].max()
+    daily_min = daily_df[1].min()
 
-    return html.Div('Daily High: {:.1f}'.format(daily_max))
+    return html.Div('Daily High: {:.1f}'.format(daily_max)), html.Div('Daily Low: {:.1f}'.format(daily_min))
     
 @app.callback(Output('live-thermometer', 'children'),
               [Input('interval-component', 'n_intervals')])
