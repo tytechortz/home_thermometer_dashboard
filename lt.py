@@ -43,18 +43,36 @@ def get_layout():
                 html.Div([
                     html.Div([
                         html.Div([
-                            html.Div(id='daily-high', style={'color':'red'})
+                            html.Div([
+                                html.Div(id='daily-high', style={'color':'red'})
+                            ],
+                                className='round1'
+                            ),
                         ],
-                            className='round1'
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div(id='daily-low', style={'color':'blue'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
                         ),
                     ],
                         className='row'
                     ),
                     html.Div([
                         html.Div([
-                            html.Div(id='daily-low', style={'color':'blue'})
+                            html.Div([
+                                html.Div('Week', style={'text-align': 'center'}),
+                            ],
+                                className='round1'
+                            ),
+                            
                         ],
-                            className='round1'
+                            className='twelve columns'
                         ),
                     ],
                         className='row'
@@ -92,7 +110,7 @@ def update_daily_stats(n, daily_data):
     daily_max = daily_df[1].max()
     daily_min = daily_df[1].min()
 
-    return html.Div('Daily High: {:.1f}'.format(daily_max)), html.Div('Daily Low: {:.1f}'.format(daily_min))
+    return html.H5('Daily High: {:.1f}'.format(daily_max)), html.H5('Daily Low: {:.1f}'.format(daily_min))
     
 @app.callback(Output('live-thermometer', 'children'),
               [Input('interval-component', 'n_intervals')])
