@@ -44,6 +44,19 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
+                                html.Div('Today', style={'text-align': 'center'}),
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
                                 html.Div(id='daily-high', style={'color':'red', 'text-align':'center'})
                             ],
                                 className='round1'
@@ -66,13 +79,34 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.Div('Week', style={'text-align': 'center'}),
+                                html.Div('Yesterday', style={'text-align': 'center'}),
                             ],
                                 className='round1'
                             ),
-                            
                         ],
                             className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div(id='yest-high', style={'color':'red', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div(id='yest-low', style={'color':'blue', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
                         ),
                     ],
                         className='row'
@@ -111,7 +145,19 @@ def update_daily_stats(n, daily_data):
     daily_max = daily_df[1].max()
     daily_min = daily_df[1].min()
 
-    return html.H5('Daily High: {:.1f}'.format(daily_max)), html.H5('Daily Low: {:.1f}'.format(daily_min))
+    return html.H5('High: {:.1f}'.format(daily_max)), html.H5('Low: {:.1f}'.format(daily_min))
+
+@app.callback([
+    Output('yest-high', 'children'),
+    Output('yest-low', 'children')],
+    [Input('interval-component', 'n_intervals'),
+    Input('yest', 'children')])
+def update_daily_stats(n, yest):
+    yest = pd.read_json(yest)
+    yest_max = yest[1].max()
+    yest_min = yest[1].min()
+
+    return html.H5('High: {:.1f}'.format(yest_max)), html.H5('Low: {:.1f}'.format(yest_min))
     
 @app.callback(Output('live-thermometer', 'children'),
               [Input('interval-component', 'n_intervals')])
@@ -147,17 +193,6 @@ def process_df_daily(n):
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    # long_months = [1,3,5,7,8,10,12]
-    # short_months = [4,6,9,11]
-    # february = 2
-    # df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty-1)] 
-    # if tm in long_months and td > 1:
-    #     df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
-    # elif tm in long_months and td == 1:
-    #     df_yest = df_stats[(df_stats.index.day == 30) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
-    # print(df_yest)
-
-    
     return dfdmy.to_json(), df_yest.to_json()  
 
 @app.callback(Output('live-graph', 'figure'),
@@ -186,6 +221,7 @@ def update_graph(n, daily_data, yest):
             marker = dict(
                 color = 'orange',
             ),
+            name='yesterday'
         ),
         go.Scatter(
             x = dfdmy['time'],
@@ -194,6 +230,7 @@ def update_graph(n, daily_data, yest):
             marker = dict(
                 color = 'black',
             ),
+            name='today'
         ),
     ]
     layout = go.Layout(
