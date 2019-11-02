@@ -137,9 +137,26 @@ def process_df_daily(n):
     dfd = df_stats[df_stats.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty] 
+
+    months = {1:31, 2:31, 3:28, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
+    months_ly = {1:31, 2:31, 3:29, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
+    print(months.get(tm))
+
+    if td > 1:
+        df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
+    elif td == 1:
+        df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
+
+    # long_months = [1,3,5,7,8,10,12]
+    # short_months = [4,6,9,11]
+    # february = 2
     # df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty-1)] 
-    df_yest = df_stats[(df_stats.index.day == 31) & (df_stats.index.month == 10) & (df_stats.index.year == 2019)]
+    # if tm in long_months and td > 1:
+    #     df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
+    # elif tm in long_months and td == 1:
+    #     df_yest = df_stats[(df_stats.index.day == 30) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
     # print(df_yest)
+
     
     return dfdmy.to_json(), df_yest.to_json()  
 
