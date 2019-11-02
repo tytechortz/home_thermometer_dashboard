@@ -6,13 +6,13 @@ import plotly.graph_objs as go
 import requests
 import pandas as pd
 import time
-from datetime import datetime
+from datetime import datetime as dt
 
 url = "http://10.0.1.7:8080"
 
 df = pd.read_csv('../../tempjan19.csv', header=None)
 
-print(df)
+# print(df)
 
 def get_layout():
     return html.Div(
@@ -44,7 +44,7 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.Div(id='daily-high', style={'color':'red'})
+                                html.Div(id='daily-high', style={'color':'red', 'text-align':'center'})
                             ],
                                 className='round1'
                             ),
@@ -53,7 +53,7 @@ def get_layout():
                         ),
                         html.Div([
                             html.Div([
-                                html.Div(id='daily-low', style={'color':'blue'})
+                                html.Div(id='daily-low', style={'color':'blue', 'text-align':'center'})
                             ],
                                 className='round1'
                             ),
@@ -83,7 +83,8 @@ def get_layout():
             ],
                 className='row'
             ),
-            html.Div(id='daily-data', style={'display': 'none'})
+            html.Div(id='daily-data', style={'display': 'none'}),
+            html.Div(id='yest', style={'display': 'none'}),
         ]
 
     )
@@ -120,56 +121,78 @@ def update_layout(n):
     f = ((9.0/5.0) * data) + 32
     return 'Current Temperature: {:.1f}'.format(f)
 
-@app.callback(Output('daily-data', 'children'),
-            [Input('interval-component', 'n_intervals')])
+@app.callback([
+    Output('daily-data', 'children'),
+    Output('yest', 'children')],
+    [Input('interval-component', 'n_intervals')])
 def process_df_daily(n):
     df_stats = df
     df_stats['datetime'] = pd.to_datetime(df_stats[0])
     df_stats = df_stats.set_index('datetime')
 
-    td = datetime.now().day
-    tm = datetime.now().month
-    ty = datetime.now().year
+    td = dt.now().day
+    tm = dt.now().month
+    ty = dt.now().year
 
     dfd = df_stats[df_stats.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
-    dfdmy = dfdm[dfdm.index.year == ty]  
-
-    return dfdmy.to_json()  
+    dfdmy = dfdm[dfdm.index.year == ty] 
+    # df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty-1)] 
+    df_yest = df_stats[(df_stats.index.day == 31) & (df_stats.index.month == 10) & (df_stats.index.year == 2019)]
+    # print(df_yest)
+    
+    return dfdmy.to_json(), df_yest.to_json()  
 
 @app.callback(Output('live-graph', 'figure'),
             [Input('interval-component-graph', 'n_intervals'),
-            Input('daily-data', 'children')])
-def update_graph(n, daily_data):
+            Input('daily-data', 'children'),
+            Input('yest', 'children')])
+def update_graph(n, daily_data, yest):
     dfdmy = pd.read_json(daily_data)
-    # df_live = df
-    
-    # df_live['datetime'] = pd.to_datetime(df_live[0])
-    # df_live = df_live.set_index('datetime')
-    # print(df_live)
-    # td = datetime.now().day
-    # tm = datetime.now().month
-    # print(tm)
-    # ty = datetime.now().year
-    # dfd = df_live[df_live.index.day == td]
-    # dfdm = dfd[dfd.index.month == tm]
-    # dfdmy = dfdm[dfdm.index.year == ty]
-    # print(dfdmy)
-    return {
-        'data': [go.Scatter(
-            x = dfdmy[0],
-            y = dfdmy[1],
+    dfdmy['time'] = pd.to_datetime(dfdmy[0])
+    dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
+    print(type(dfdmy[1][0]))
+    yest = pd.read_json(yest)
+    # yest['today']=dfdmy[1]
+    # dfdmy['yest']=yest[1]
+    print(yest)
+    yest['time'] = pd.to_datetime(yest[0])
+    yest['time'] = yest['time'].dt.strftime('%H:%M')
+    # dfdmy['date'] = pd.to_datetime(dfdmy[0])
+    # dfdmy['date']= dfdmy['date'].dt.strftime('%m-%d %H:%M:%S')
+    print(yest)
+    data = [
+        go.Scatter(
+            x = yest['time'],
+            y = yest[1],
             mode = 'markers+lines',
             marker = dict(
                 color = 'orange',
             ),
-        )],
-        'layout': go.Layout(
-            xaxis=dict(
-                tickformat='%H%M'
-            )
         ),
-    }
+        go.Scatter(
+            x = dfdmy['time'],
+            y = dfdmy[1],
+            mode = 'markers+lines',
+            marker = dict(
+                color = 'black',
+            ),
+        ),
+    ]
+    layout = go.Layout(
+        xaxis=dict(tickformat='%H%M')
+    )
+    return {'data': data, 'layout': layout}
+    # return {
+    #     'data': [go.Scatter(
+            
+    #     )],
+    #     'layout': go.Layout(
+    #         xaxis=dict(
+    #             tickformat='%H%M'
+    #         )
+    #     ),
+    # }
 
 if __name__ == "__main__":
     app.run_server(port=8050, debug=False)
