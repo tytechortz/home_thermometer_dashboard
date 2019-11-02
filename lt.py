@@ -10,7 +10,7 @@ from datetime import datetime as dt
 
 url = "http://10.0.1.7:8080"
 
-df = pd.read_csv('../../tempjan19.csv', header=None)
+# df = pd.read_csv('../../tempjan19.csv', header=None)
 
 # print(df)
 
@@ -138,7 +138,7 @@ app.config['suppress_callback_exceptions']=True
 @app.callback([
     Output('daily-high', 'children'),
     Output('daily-low', 'children')],
-    [Input('interval-component', 'n_intervals'),
+    [Input('interval-component-graph', 'n_intervals'),
     Input('daily-data', 'children')])
 def update_daily_stats(n, daily_data):
     daily_df = pd.read_json(daily_data)
@@ -150,7 +150,7 @@ def update_daily_stats(n, daily_data):
 @app.callback([
     Output('yest-high', 'children'),
     Output('yest-low', 'children')],
-    [Input('interval-component', 'n_intervals'),
+    [Input('interval-component-graph', 'n_intervals'),
     Input('yest', 'children')])
 def update_daily_stats(n, yest):
     yest = pd.read_json(yest)
@@ -170,8 +170,9 @@ def update_layout(n):
 @app.callback([
     Output('daily-data', 'children'),
     Output('yest', 'children')],
-    [Input('interval-component', 'n_intervals')])
+    [Input('interval-component-graph', 'n_intervals')])
 def process_df_daily(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
     df_stats = df
     df_stats['datetime'] = pd.to_datetime(df_stats[0])
     df_stats = df_stats.set_index('datetime')
@@ -203,16 +204,16 @@ def update_graph(n, daily_data, yest):
     dfdmy = pd.read_json(daily_data)
     dfdmy['time'] = pd.to_datetime(dfdmy[0])
     dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
-    print(type(dfdmy[1][0]))
+    # print(type(dfdmy[1][0]))
     yest = pd.read_json(yest)
     # yest['today']=dfdmy[1]
     # dfdmy['yest']=yest[1]
-    print(yest)
+    # print(yest)
     yest['time'] = pd.to_datetime(yest[0])
     yest['time'] = yest['time'].dt.strftime('%H:%M')
     # dfdmy['date'] = pd.to_datetime(dfdmy[0])
     # dfdmy['date']= dfdmy['date'].dt.strftime('%m-%d %H:%M:%S')
-    print(yest)
+    # print(yest)
     data = [
         go.Scatter(
             x = yest['time'],
