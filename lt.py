@@ -7,6 +7,7 @@ import requests
 import pandas as pd
 import time
 from datetime import datetime as dt
+import re
 
 url = "http://10.0.1.7:8080"
 
@@ -111,6 +112,41 @@ def get_layout():
                     ],
                         className='row'
                     ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div('Records', style={'text-align': 'center'}),
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div(id='rec-high', style={'color':'red', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div(id='rec-low', style={'color':'blue', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
                 ],
                 className='four columns'
                 ),
@@ -119,6 +155,8 @@ def get_layout():
             ),
             html.Div(id='daily-data', style={'display': 'none'}),
             html.Div(id='yest', style={'display': 'none'}),
+            html.Div(id='record-highs', style={'display': 'none'}),
+            html.Div(id='record-lows', style={'display': 'none'}),
         ]
 
     )
@@ -127,13 +165,25 @@ app = dash.Dash(__name__)
 app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
 
-# @app.callback(
-#     Output('graph', 'children'),
-#     [Input('product', 'value')])
-# def display_graph(value):
-#     print(value)
-#     if value == 'live-graph':
-#         return dcc.Graph(id='live-graph')
+@app.callback([
+    Output('rec-high', 'children'),
+    Output('rec-low', 'children')],
+    [Input('interval-component-graph', 'n_intervals'),
+    Input('record-highs', 'children'),
+    Input('record-lows', 'children')])
+def update_daily_stats(n, record_highs, record_lows):
+    record_highs = pd.read_json(record_highs)
+    record_lows = pd.read_json(record_lows)
+    print(record_highs)
+    today = time.strftime("%m-%d")
+    print(today)
+    record_high = record_highs.loc[record_highs.index == today]
+    record_low = record_lows.loc[record_lows.index == today]
+    print(record_high)
+    print(type(record_high))
+    # record_highs = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
+
+    return html.H5('High: {:.1f}'.format(record_high.iloc[0,1])), html.H5('Low: {:.1f}'.format(record_low.iloc[0,1]))
 
 @app.callback([
     Output('daily-high', 'children'),
@@ -169,7 +219,9 @@ def update_layout(n):
 
 @app.callback([
     Output('daily-data', 'children'),
-    Output('yest', 'children')],
+    Output('yest', 'children'),
+    Output('record-highs', 'children'),
+    Output('record-lows', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
 def process_df_daily(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
@@ -185,16 +237,33 @@ def process_df_daily(n):
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty] 
 
+    # print(df_stats)
+
+    record_highs = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
+    record_lows = df_stats.groupby(df_stats.index.strftime('%m-%d')).min()
+
+  
+    # daily_highs = df_stats.resample('D')[1].max()
+    # print(daily_highs)
+    # daily_highs['rec high'] = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).max()
+    # record_highs = daily_highs.resample('D').max()
+    # print(record_highs)
+
+    # daily_lows = df_stats.resample('D')[1].min()
+    # record_highs = df_stats.groupby(pd.Grouper(freq='D')).max()
+    # print(daily_highs)
+    # print(daily_lows)
+
     months = {1:31, 2:31, 3:28, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
     months_ly = {1:31, 2:31, 3:29, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
-    print(months.get(tm))
+    # print(dfdmy)
 
     if td > 1:
         df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return dfdmy.to_json(), df_yest.to_json()  
+    return dfdmy.to_json(), df_yest.to_json(), record_highs.to_json(), record_lows.to_json()  
 
 @app.callback(Output('live-graph', 'figure'),
             [Input('interval-component-graph', 'n_intervals'),
@@ -204,16 +273,9 @@ def update_graph(n, daily_data, yest):
     dfdmy = pd.read_json(daily_data)
     dfdmy['time'] = pd.to_datetime(dfdmy[0])
     dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
-    # print(type(dfdmy[1][0]))
     yest = pd.read_json(yest)
-    # yest['today']=dfdmy[1]
-    # dfdmy['yest']=yest[1]
-    # print(yest)
     yest['time'] = pd.to_datetime(yest[0])
     yest['time'] = yest['time'].dt.strftime('%H:%M')
-    # dfdmy['date'] = pd.to_datetime(dfdmy[0])
-    # dfdmy['date']= dfdmy['date'].dt.strftime('%m-%d %H:%M:%S')
-    # print(yest)
     data = [
         go.Scatter(
             x = yest['time'],
