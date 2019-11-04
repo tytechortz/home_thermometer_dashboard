@@ -289,10 +289,12 @@ def process_df_daily(n):
     print(record_highs)
     daily_highs = record_highs.groupby([record_highs.index.month, record_highs.index.day]).idxmax()
     print(daily_highs)
-    rec_high = daily_highs.loc[(1,5), 1]
-    print(rec_high)
+    rec_high_date = daily_highs.loc[(tm,td), 1]
+    
 
-    # daily_lows = df_stats.resample('D')[1].min()
+    record_lows = df_stats.resample('D').min()
+    daily_lows = record_lows.groupby([record_lows.index.month, record_lows.index.day]).idxmin()
+    rec_low_date = daily_highs.loc[(tm,td), 1]
     # record_highs = df_stats.groupby(pd.Grouper(freq='D')).max()
     # print(daily_highs)
     # print(daily_lows)
