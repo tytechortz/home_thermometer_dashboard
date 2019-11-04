@@ -157,8 +157,8 @@ def get_layout():
             ),
             html.Div(id='daily-data', style={'display': 'none'}),
             html.Div(id='yest', style={'display': 'none'}),
-            html.Div(id='record-highs', style={'display': 'none'}),
-            html.Div(id='record-lows', style={'display': 'none'}),
+            html.Div(id='record-high-temps', style={'display': 'none'}),
+            html.Div(id='record-low-temps', style={'display': 'none'}),
             html.Div(id='high-dates', style={'display': 'none'}),
             html.Div(id='low-dates', style={'display': 'none'}),
         ]
@@ -173,13 +173,15 @@ app.config['suppress_callback_exceptions']=True
     Output('rec-high', 'children'),
     Output('rec-low', 'children')],
     [Input('interval-component-graph', 'n_intervals'),
-    Input('record-highs', 'children'),
-    Input('record-lows', 'children')])
+    Input('record-high-temps', 'children'),
+    Input('record-low-temps', 'children')])
 def update_daily_stats(n, record_highs, record_lows):
     record_highs = pd.read_json(record_highs)
     record_lows = pd.read_json(record_lows)
+    print(record_highs)
     today = time.strftime("%m-%d")
     record_high = record_highs.loc[record_highs.index == today]
+    print(record_high)
     record_low = record_lows.loc[record_lows.index == today]
 
     return html.P('High: {:.1f}'.format(record_high.iloc[0,1])), html.P('Low: {:.1f}'.format(record_low.iloc[0,1]))
@@ -238,8 +240,8 @@ def update_layout(n):
 @app.callback([
     Output('daily-data', 'children'),
     Output('yest', 'children'),
-    Output('record-highs', 'children'),
-    Output('record-lows', 'children'),
+    Output('record-high-temps', 'children'),
+    Output('record-low-temps', 'children'),
     Output('rec-high-date', 'children'),
     Output('rec-low-date', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
@@ -249,7 +251,7 @@ def process_df_daily(n):
     df_stats = df
     df_stats['datetime'] = pd.to_datetime(df_stats[0])
     df_stats = df_stats.set_index('datetime')
-    print(df_stats)
+    # print(df_stats)
     today = time.strftime("%m-%d")
     
     td = dt.now().day
@@ -270,13 +272,13 @@ def process_df_daily(n):
     # rec_high_date = high_date[1].dt.year
     # print(rec_high_date)
     # rec_high_date = high_date[1]
-    # record_highs = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
+    record_high_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
     # record_highs = df_stats.loc[today]
     # print(record_highs)
     low_dates = df_stats.groupby(df_stats.index.strftime('%m-%d')).idxmin()
     # rec_low_date = low_dates.iloc[low_dates.index == today][1]
     # print(low_dates)
-    record_lows = df_stats.groupby(df_stats.index.strftime('%m-%d')).min()
+    record_low_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).min()
 
 
     # df_stats['rh'] = df_stats.groupby([df_stats.index.month, df_stats.index.day], as_index=False).max()
@@ -286,15 +288,15 @@ def process_df_daily(n):
 
     # daily_highs['rec high'] = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).max()
     record_highs = df_stats.resample('D').max()
-    print(record_highs)
+    # print(record_highs)
     daily_highs = record_highs.groupby([record_highs.index.month, record_highs.index.day]).idxmax()
-    print(daily_highs)
-    rec_high_date = daily_highs.loc[(tm,td), 1]
+    # print(daily_highs)
+    rec_high_date = daily_highs.loc[(tm,td), 1].year
     
 
     record_lows = df_stats.resample('D').min()
     daily_lows = record_lows.groupby([record_lows.index.month, record_lows.index.day]).idxmin()
-    rec_low_date = daily_highs.loc[(tm,td), 1]
+    rec_low_date = daily_highs.loc[(tm,td), 1].year
     # record_highs = df_stats.groupby(pd.Grouper(freq='D')).max()
     # print(daily_highs)
     # print(daily_lows)
@@ -308,7 +310,7 @@ def process_df_daily(n):
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return dfdmy.to_json(), df_yest.to_json(), record_highs.to_json(), record_lows.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date))
+    return dfdmy.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date))
 
 @app.callback(Output('live-graph', 'figure'),
             [Input('interval-component-graph', 'n_intervals'),
