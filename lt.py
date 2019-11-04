@@ -156,6 +156,7 @@ def get_layout():
                 className='row'
             ),
             html.Div(id='daily-data', style={'display': 'none'}),
+            html.Div(id='last-year', style={'display': 'none'}),
             html.Div(id='yest', style={'display': 'none'}),
             html.Div(id='record-high-temps', style={'display': 'none'}),
             html.Div(id='record-low-temps', style={'display': 'none'}),
@@ -178,32 +179,11 @@ app.config['suppress_callback_exceptions']=True
 def update_daily_stats(n, record_highs, record_lows):
     record_highs = pd.read_json(record_highs)
     record_lows = pd.read_json(record_lows)
-    print(record_highs)
     today = time.strftime("%m-%d")
     record_high = record_highs.loc[record_highs.index == today]
-    print(record_high)
     record_low = record_lows.loc[record_lows.index == today]
 
     return html.P('High: {:.1f}'.format(record_high.iloc[0,1])), html.P('Low: {:.1f}'.format(record_low.iloc[0,1]))
-
-# @app.callback([
-#     Output('rec-high-date', 'children'),
-#     Output('rec-low-date', 'children')],
-#     [Input('interval-component-graph', 'n_intervals'),
-#     Input('high-dates', 'children'),
-#     Input('low-dates', 'children')])
-# def update_daily_stats(n, high_dates, low_dates):
-#     high_dates = pd.read_json(high_dates)
-#     low_dates = pd.read_json(low_dates)
-#     print(type(high_dates[1][1]))
-#     high_dates['date'] = pd.to_datetime(high_dates[1])
-#     print(high_dates)
-#     # record_high_date = high_dates.loc[record]
-#     today = time.strftime("%m-%d")
-#     # record_high_date = record_high_date.loc[record_highs.index == today]
-#     # record_low_date = record_lows.loc[record_lows.index == today]
-
-#     return html.P('Date: {:.1f}'.format(high_dates.iloc[0,1])), html.P('Date: {:.1f}'.format(low_dates.iloc[0,1]))
 
 @app.callback([
     Output('daily-high', 'children'),
@@ -239,6 +219,7 @@ def update_layout(n):
 
 @app.callback([
     Output('daily-data', 'children'),
+    Output('last-year', 'children'),
     Output('yest', 'children'),
     Output('record-high-temps', 'children'),
     Output('record-low-temps', 'children'),
@@ -251,78 +232,59 @@ def process_df_daily(n):
     df_stats = df
     df_stats['datetime'] = pd.to_datetime(df_stats[0])
     df_stats = df_stats.set_index('datetime')
-    # print(df_stats)
     today = time.strftime("%m-%d")
     
     td = dt.now().day
     tm = dt.now().month
     ty = dt.now().year
+    ly = ty-1
+    print(ly)
 
     dfd = df_stats[df_stats.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty] 
-    # print(dfdmy)
-    # dfdmy['Year'] = dfdmy.index.year
-    
-    # print(df_stats)
-    # high_dates = df_stats.groupby(df_stats.index.strftime('%m-%d')).idxmax()
-    # print(high_dates.loc[high_dates.index == today])
-    # high_date = high_dates.loc[high_dates.index == today]
-    # print(high_date[1].year)
-    # rec_high_date = high_date[1].dt.year
-    # print(rec_high_date)
-    # rec_high_date = high_date[1]
-    record_high_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
-    # record_highs = df_stats.loc[today]
-    # print(record_highs)
-    low_dates = df_stats.groupby(df_stats.index.strftime('%m-%d')).idxmin()
-    # rec_low_date = low_dates.iloc[low_dates.index == today][1]
-    # print(low_dates)
-    record_low_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).min()
+    print(dfdmy)
 
-
-    # df_stats['rh'] = df_stats.groupby([df_stats.index.month, df_stats.index.day], as_index=False).max()
+    dfly = dfdm[dfdm.index.year == ly]
+    print(dfly)
    
-    
-    # record_highs = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
-
-    # daily_highs['rec high'] = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).max()
+    record_high_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
     record_highs = df_stats.resample('D').max()
-    # print(record_highs)
     daily_highs = record_highs.groupby([record_highs.index.month, record_highs.index.day]).idxmax()
-    # print(daily_highs)
     rec_high_date = daily_highs.loc[(tm,td), 1].year
     
-
+    record_low_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).min()
     record_lows = df_stats.resample('D').min()
     daily_lows = record_lows.groupby([record_lows.index.month, record_lows.index.day]).idxmin()
     rec_low_date = daily_highs.loc[(tm,td), 1].year
-    # record_highs = df_stats.groupby(pd.Grouper(freq='D')).max()
-    # print(daily_highs)
-    # print(daily_lows)
 
     months = {1:31, 2:31, 3:28, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
     months_ly = {1:31, 2:31, 3:29, 4:31, 5:30, 6:31, 7:30, 8:31, 9:31, 10:30, 11:31, 12:30}
-    # print(dfdmy)
 
     if td > 1:
         df_yest = df_stats[(df_stats.index.day == td-1) & (df_stats.index.month == tm) & (df_stats.index.year == ty)]
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return dfdmy.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date))
+    return dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date))
 
 @app.callback(Output('live-graph', 'figure'),
             [Input('interval-component-graph', 'n_intervals'),
             Input('daily-data', 'children'),
+            Input('last-year', 'children'),
             Input('yest', 'children')])
-def update_graph(n, daily_data, yest):
+def update_graph(n, daily_data, last_year, yest):
     dfdmy = pd.read_json(daily_data)
     dfdmy['time'] = pd.to_datetime(dfdmy[0])
     dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
     yest = pd.read_json(yest)
     yest['time'] = pd.to_datetime(yest[0])
     yest['time'] = yest['time'].dt.strftime('%H:%M')
+
+    dfly = pd.read_json(last_year)
+    dfly['time'] = pd.to_datetime(dfly[0])
+    dfly['time'] = dfly['time'].dt.strftime('%H:%M')
+
     data = [
         go.Scatter(
             x = yest['time'],
@@ -341,6 +303,15 @@ def update_graph(n, daily_data, yest):
                 color = 'black',
             ),
             name='today'
+        ),
+        go.Scatter(
+            x = dfly['time'],
+            y = dfly[1],
+            mode = 'markers+lines',
+            marker = dict(
+                color = 'blue',
+            ),
+            name='last year'
         ),
     ]
     layout = go.Layout(
