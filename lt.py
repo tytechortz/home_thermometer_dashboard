@@ -277,7 +277,7 @@ def process_df_daily(n):
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date)), html.P('{:.1f}'.format(rec_low_high)), html.P('{:.1f}'.format(rec_high_low))
+    return dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date)), html.P('LH: {:.1f}'.format(rec_low_high)), html.P('HL: {:.1f}'.format(rec_high_low))
 
 @app.callback(Output('live-graph', 'figure'),
             [Input('interval-component-graph', 'n_intervals'),
