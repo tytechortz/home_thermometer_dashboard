@@ -371,25 +371,39 @@ def process_df_daily(n):
     Input('graph-picker', 'value'),
     Input('last-year', 'children')])
 def hist_graph(selected_date, daily_data, selected_graph, last_year):
-    df = pd.read_csv('../../tempjan19.csv', header=None)
-    df['time'] = pd.to_datetime(df[0])
-    # df['time'] = df['time'].dt.strftime('%H:%M')
-    df = df.set_index('time')
-    print(df)
-
     td = int(selected_date[8:])
     tm = int(selected_date[5:7])
     ty = int(selected_date[0:4])
-    print(td)
-    print(tm)
-    print(ty)
 
+    # today = time.strftime("%Y-%m-%d")
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['time'] = pd.to_datetime(df[0])
+    df = df.set_index('time')
+   
+    years = list(df.index.year.drop_duplicates())
+    years = [x for x in years if str(x) != 'nan']
+    years = [int(i) for i in years]
+
+
+    today_data = df.loc[selected_date]
+    data = []
+    frames = []
+
+    for year in years:
+        frames.append(df.loc[str(year)+'-'+str(tm)+'-'+str(td)])
+
+    for frame in frames:
+        data.append(go.Scatter(
+            x = frame.index.strftime('%H:%M'),
+            y = frame[1],
+            mode = 'markers+lines',
+        ))
+    
     dfd = df[df.index.day == td]
     dfdm = dfd[dfd.index.month == tm]
     dfdmy = dfdm[dfdm.index.year == ty] 
-    print(dfdmy)
 
-    data = [
+    # data = [
         # go.Scatter(
         #     x = yest['time'],
         #     y = yest[1],
@@ -399,15 +413,15 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
         #     ),
         #     name='yesterday'
         # ),
-        go.Scatter(
-            x = dfdmy.index,
-            y = dfdmy[1],
-            mode = 'markers+lines',
-            marker = dict(
-                color = 'red',
-            ),
-            name='today'
-        ),
+        # go.Scatter(
+        #     x = today_data.index,
+        #     y = today_data[1],
+        #     mode = 'markers+lines',
+        #     marker = dict(
+        #         color = 'red',
+        #     ),
+        #     name='today'
+        # ),
         # go.Scatter(
         #     x = dfly['time'],
         #     y = dfly[1],
@@ -417,7 +431,7 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
         #     ),
         #     name='last year'
         # ),
-    ]
+    # ]
     layout = go.Layout(
         xaxis=dict(tickformat='%H%M'),
         height=500
