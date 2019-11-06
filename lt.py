@@ -372,23 +372,22 @@ def process_df_daily(n):
     Input('last-year', 'children')])
 def hist_graph(selected_date, daily_data, selected_graph, last_year):
     df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['time'] = pd.to_datetime(df[0])
+    # df['time'] = df['time'].dt.strftime('%H:%M')
+    df = df.set_index('time')
+    print(df)
 
-    td = selected_date[8:]
-    tm = selected_date[5:7]
-    ty = selected_date[0:4]
+    td = int(selected_date[8:])
+    tm = int(selected_date[5:7])
+    ty = int(selected_date[0:4])
     print(td)
     print(tm)
     print(ty)
 
-    # dfd = df_stats[df_stats.index.day == td]
-    # dfdm = dfd[dfd.index.month == tm]
-    # dfdmy = dfdm[dfdm.index.year == ty] 
-
-
-
-    # tyd = pd.read_json(daily_data)
-    print(type(selected_date))
-
+    dfd = df[df.index.day == td]
+    dfdm = dfd[dfd.index.month == tm]
+    dfdmy = dfdm[dfdm.index.year == ty] 
+    print(dfdmy)
 
     data = [
         # go.Scatter(
@@ -400,15 +399,15 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
         #     ),
         #     name='yesterday'
         # ),
-        # go.Scatter(
-        #     x = dfdmy['time'],
-        #     y = dfdmy[1],
-        #     mode = 'markers+lines',
-        #     marker = dict(
-        #         color = 'red',
-        #     ),
-        #     name='today'
-        # ),
+        go.Scatter(
+            x = dfdmy.index,
+            y = dfdmy[1],
+            mode = 'markers+lines',
+            marker = dict(
+                color = 'red',
+            ),
+            name='today'
+        ),
         # go.Scatter(
         #     x = dfly['time'],
         #     y = dfly[1],
