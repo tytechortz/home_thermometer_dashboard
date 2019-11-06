@@ -153,6 +153,30 @@ def get_layout():
                     ],
                         className='row'
                     ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div('Counts', style={'text-align': 'center'}),
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div(id='rec-high-count', style={'color':'blue', 'text-align':'center'}),
+                            ])
+                        ],
+                            className='six columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
                 ],
                 className='four columns'
                 ),
@@ -173,6 +197,11 @@ def get_layout():
 app = dash.Dash(__name__)
 app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
+
+# @app.callback(
+#     Output('rec-high-count', 'children'),
+#     [Input('')]
+# ])
 
 @app.callback([
     Output('rec-high', 'children'),
@@ -310,7 +339,7 @@ def update_graph(n, daily_data, last_year, yest):
             y = yest[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'orange',
+                color = 'blue',
             ),
             name='yesterday'
         ),
@@ -319,7 +348,7 @@ def update_graph(n, daily_data, last_year, yest):
             y = dfdmy[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'black',
+                color = 'red',
             ),
             name='today'
         ),
@@ -328,13 +357,14 @@ def update_graph(n, daily_data, last_year, yest):
             y = dfly[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'blue',
+                color = 'orange',
             ),
             name='last year'
         ),
     ]
     layout = go.Layout(
-        xaxis=dict(tickformat='%H%M')
+        xaxis=dict(tickformat='%H%M'),
+        height=500
     )
     return {'data': data, 'layout': layout}
     # return {
