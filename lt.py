@@ -14,6 +14,7 @@ url = "http://10.0.1.7:8080"
 # df = pd.read_csv('../../tempjan19.csv', header=None)
 
 # print(df)
+today = time.strftime("%Y-%m-%d")
 
 def get_layout():
     return html.Div(
@@ -24,12 +25,27 @@ def get_layout():
                 ],
                 className='six columns'
                 ),
+            ],
+                className='row'
+            ),
             html.Div([
-                dcc.DatePickerSingle(
-                    id='date-picker',
-                    
+                html.Div([
+                    dcc.RadioItems(
+                        id='graph-picker',
+                        options=[
+                            {'label':'Live', 'value':'live-graph'},
+                            {'label':'Past', 'value':'past-graph'},
+                        ],
+                        value='live-graph',
+                        labelStyle={'display':'inline'},
                     )
-            ]),
+                ]),
+                html.Div([
+                    dcc.DatePickerSingle(
+                        id='date-picker',
+                        date=today
+                    ),
+                ]),
             ],
                 className='row'
             ),
@@ -37,7 +53,7 @@ def get_layout():
             html.Div([
                 dcc.Interval(
                     id='interval-component-graph',
-                    interval=900000,
+                    interval=160000,
                     n_intervals=0
                 ),
                 dcc.Interval(
@@ -48,9 +64,7 @@ def get_layout():
             ]),
             html.Div([
                 html.Div([
-                    dcc.Graph(
-                        id='live-graph'
-                    ),
+                    html.Div(id='graph'),
                 ],
                     className='eight columns'
                 ),
@@ -212,6 +226,18 @@ app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
 
 @app.callback(
+    Output('graph', 'children'),
+    [Input('graph-picker', 'value')])
+def select_graph(selected_graph):
+    print(selected_graph)
+    if selected_graph == 'live-graph':
+        return dcc.Graph(id='live-graph')
+    elif selected_graph == 'past-graph':
+        return dcc.Graph(id='past-graph')
+
+
+
+@app.callback(
     Output('rec-high-count', 'children'),
     [Input('record-high-temps', 'children'),
     Input('record-low-temps', 'children'),
@@ -336,12 +362,80 @@ def process_df_daily(n):
 
     return dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date)), html.P('LH: {:.1f}'.format(rec_low_high)), html.P('{}'.format(rec_low_high_date)), html.P('HL: {:.1f}'.format(rec_high_low)), html.P('{}'.format(rec_high_low_date))
 
-@app.callback(Output('live-graph', 'figure'),
-            [Input('interval-component-graph', 'n_intervals'),
-            Input('daily-data', 'children'),
-            Input('last-year', 'children'),
-            Input('yest', 'children')])
-def update_graph(n, daily_data, last_year, yest):
+
+
+@app.callback(
+    Output('past-graph', 'figure'),
+    [Input('date-picker', 'date'),
+    Input('daily-data', 'children'),
+    Input('graph-picker', 'value'),
+    Input('last-year', 'children')])
+def hist_graph(selected_date, daily_data, selected_graph, last_year):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+
+    td = selected_date[8:]
+    tm = selected_date[5:7]
+    ty = selected_date[0:4]
+    print(td)
+    print(tm)
+    print(ty)
+
+    # dfd = df_stats[df_stats.index.day == td]
+    # dfdm = dfd[dfd.index.month == tm]
+    # dfdmy = dfdm[dfdm.index.year == ty] 
+
+
+
+    # tyd = pd.read_json(daily_data)
+    print(type(selected_date))
+
+
+    data = [
+        # go.Scatter(
+        #     x = yest['time'],
+        #     y = yest[1],
+        #     mode = 'markers+lines',
+        #     marker = dict(
+        #         color = 'blue',
+        #     ),
+        #     name='yesterday'
+        # ),
+        # go.Scatter(
+        #     x = dfdmy['time'],
+        #     y = dfdmy[1],
+        #     mode = 'markers+lines',
+        #     marker = dict(
+        #         color = 'red',
+        #     ),
+        #     name='today'
+        # ),
+        # go.Scatter(
+        #     x = dfly['time'],
+        #     y = dfly[1],
+        #     mode = 'markers+lines',
+        #     marker = dict(
+        #         color = 'gold',
+        #     ),
+        #     name='last year'
+        # ),
+    ]
+    layout = go.Layout(
+        xaxis=dict(tickformat='%H%M'),
+        height=500
+    )
+
+
+    return {'data': data, 'layout': layout}
+
+
+@app.callback(
+    Output('live-graph', 'figure'),
+    [Input('interval-component', 'n_intervals'),
+    Input('daily-data', 'children'),
+    Input('last-year', 'children'),
+    Input('graph-picker', 'value'),
+    Input('yest', 'children')])
+def update_graph(n, daily_data, last_year, selected_graph, yest):
     dfdmy = pd.read_json(daily_data)
     dfdmy['time'] = pd.to_datetime(dfdmy[0])
     dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
@@ -352,6 +446,8 @@ def update_graph(n, daily_data, last_year, yest):
     dfly = pd.read_json(last_year)
     dfly['time'] = pd.to_datetime(dfly[0])
     dfly['time'] = dfly['time'].dt.strftime('%H:%M')
+
+    # if selected_date == ''
 
     data = [
         go.Scatter(
@@ -387,16 +483,7 @@ def update_graph(n, daily_data, last_year, yest):
         height=500
     )
     return {'data': data, 'layout': layout}
-    # return {
-    #     'data': [go.Scatter(
-            
-    #     )],
-    #     'layout': go.Layout(
-    #         xaxis=dict(
-    #             tickformat='%H%M'
-    #         )
-    #     ),
-    # }
+  
 
 if __name__ == "__main__":
     app.run_server(port=8050, debug=False)
