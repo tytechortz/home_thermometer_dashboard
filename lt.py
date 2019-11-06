@@ -19,8 +19,21 @@ def get_layout():
     return html.Div(
         [
             html.Div([
-                html.Div(id='live-thermometer', style={'color':'green', 'font-size': 40, 'font-family':'sans-serif'})
+                html.Div([
+                    html.Div(id='live-thermometer', style={'color':'green', 'font-size': 40, 'font-family':'sans-serif'})
+                ],
+                className='six columns'
+                ),
+            html.Div([
+                dcc.DatePickerSingle(
+                    id='date-picker',
+                    
+                    )
             ]),
+            ],
+                className='row'
+            ),
+            
             html.Div([
                 dcc.Interval(
                     id='interval-component-graph',
@@ -198,10 +211,17 @@ app = dash.Dash(__name__)
 app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
 
-# @app.callback(
-#     Output('rec-high-count', 'children'),
-#     [Input('')]
-# ])
+@app.callback(
+    Output('rec-high-count', 'children'),
+    [Input('record-high-temps', 'children'),
+    Input('record-low-temps', 'children'),
+    Input('interval-component-graph', 'n_intervals')])
+def update_daily_stats(record_highs, record_lows, n):
+    record_highs = pd.read_json(record_highs)
+    record_lows = pd.read_json(record_lows)
+    print (record_highs)
+
+    return None
 
 @app.callback([
     Output('rec-high', 'children'),
@@ -357,7 +377,7 @@ def update_graph(n, daily_data, last_year, yest):
             y = dfly[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'orange',
+                color = 'gold',
             ),
             name='last year'
         ),
