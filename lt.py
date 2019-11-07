@@ -53,7 +53,7 @@ def get_layout():
             html.Div([
                 dcc.Interval(
                     id='interval-component-graph',
-                    interval=160000,
+                    interval=900000,
                     n_intervals=0
                 ),
                 dcc.Interval(
@@ -235,19 +235,30 @@ def select_graph(selected_graph):
     elif selected_graph == 'past-graph':
         return dcc.Graph(id='past-graph')
 
-
-
 @app.callback(
     Output('rec-high-count', 'children'),
-    [Input('record-high-temps', 'children'),
-    Input('record-low-temps', 'children'),
-    Input('interval-component-graph', 'n_intervals')])
-def update_daily_stats(record_highs, record_lows, n):
-    record_highs = pd.read_json(record_highs)
-    record_lows = pd.read_json(record_lows)
-    print (record_highs)
-
-    return None
+    [Input('interval-component-graph', 'n_intervals')])
+def update_daily_stats(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df_s = df
+    df_s['date'] = pd.to_datetime(df_s[0])
+    df_s = df_s.set_index('date')
+   
+    daily_highs = df_s.resample('D').max()
+    daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
+  
+    rh_tot = daily_high[1]
+   
+    tot_2018 = []
+    tot_2019 = []
+ 
+    for index, value in rh_tot.items():
+        if value.year == 2018:
+            tot_2018.append(value)
+        else:
+            tot_2019.append(value)
+   
+    return 
 
 @app.callback([
     Output('rec-high', 'children'),
@@ -333,12 +344,15 @@ def process_df_daily(n):
     # print(dfly)
    
     record_high_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
+    # print(record_high_temps)
     record_highs = df_stats.resample('D').max()
     daily_highs = record_highs.groupby([record_highs.index.month, record_highs.index.day]).max()
     low_daily_highs = record_highs.groupby([record_highs.index.month, record_highs.index.day]).min()
     low_daily_highs_date = record_highs.groupby([record_highs.index.month, record_highs.index.day]).idxmin()
     daily_highs_date = record_highs.groupby([record_highs.index.month, record_highs.index.day]).idxmax()
+   
     rec_high_date = daily_highs_date.loc[(tm,td), 1].year
+   
     rec_low_high = low_daily_highs.loc[(tm,td), 1]
     rec_low_high_date = low_daily_highs_date.loc[(tm,td), 1].year
     
@@ -360,7 +374,13 @@ def process_df_daily(n):
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), html.P('{}'.format(rec_high_date)), html.P('{}'.format(rec_low_date)), html.P('LH: {:.1f}'.format(rec_low_high)), html.P('{}'.format(rec_low_high_date)), html.P('HL: {:.1f}'.format(rec_high_low)), html.P('{}'.format(rec_high_low_date))
+    return (dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), 
+        html.P('{}'.format(rec_high_date)), 
+        html.P('{}'.format(rec_low_date)), 
+        html.P('LH: {:.1f}'.format(rec_low_high)), 
+        html.P('{}'.format(rec_low_high_date)), 
+        html.P('HL: {:.1f}'.format(rec_high_low)), 
+        html.P('{}'.format(rec_high_low_date)))
 
 
 
@@ -397,11 +417,13 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
             x = frame.index.strftime('%H:%M'),
             y = frame[1],
             mode = 'markers+lines',
+            name = frame.index[0].year
         ))
-    
-    dfd = df[df.index.day == td]
-    dfdm = dfd[dfd.index.month == tm]
-    dfdmy = dfdm[dfdm.index.year == ty] 
+
+  
+    # dfd = df[df.index.day == td]
+    # dfdm = dfd[dfd.index.month == tm]
+    # dfdmy = dfdm[dfdm.index.year == ty] 
 
     # data = [
         # go.Scatter(
