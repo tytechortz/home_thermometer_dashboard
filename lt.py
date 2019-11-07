@@ -197,8 +197,13 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.Div(id='rec-high-count', style={'color':'blue', 'text-align':'center'}),
-                            ])
+                                html.Div([
+                                    html.P('Record Highs', style={'color':'red', 'text-align':'center'}),
+                                    html.Div(id='rec-high-count', style={'color':'red', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
                         ],
                             className='six columns'
                         ),
