@@ -8,6 +8,7 @@ import pandas as pd
 import time
 from datetime import datetime as dt
 import re
+import collections
 
 url = "http://10.0.1.7:8080"
 
@@ -249,16 +250,42 @@ def update_daily_stats(n):
   
     rh_tot = daily_high[1]
    
-    tot_2018 = []
-    tot_2019 = []
- 
-    for index, value in rh_tot.items():
-        if value.year == 2018:
-            tot_2018.append(value)
-        else:
-            tot_2019.append(value)
-   
-    return 
+    # print(type(rh_tot))
+
+    years = rh_tot.tolist()
+
+    # print(years)
+    # print(type(years))
+    year_list = []
+    for x in years:
+        year_list.append(x.year)
+    
+    # print(year_list)
+    # u_years = [2018, 2019]
+    # print(u_years)
+    # print(year_list[0])
+
+    counts = collections.Counter(year_list)
+    print(counts[2018])
+
+    # for x in year_list:
+    #     if x == u_years:
+    #         u_years += 1
+
+    # for year in u_years:
+    #     print(year)
+    #     for x in year_list:
+    #         if x == year:
+    #             year += 1
+    # print(u_years)
+
+    # for index, value in rh_tot.items():
+    #     if value.year == 2018:
+    #         tot_2018.append(value)
+    #     else:
+    #         tot_2019.append(value)
+
+    return html.P('2018: {}'.format(counts[2018]))
 
 @app.callback([
     Output('rec-high', 'children'),
