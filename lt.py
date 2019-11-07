@@ -207,6 +207,18 @@ def get_layout():
                         ],
                             className='six columns'
                         ),
+                        html.Div([
+                            html.Div([
+                                html.Div([
+                                    html.P('Record Lows', style={'color':'blue', 'text-align':'center'}),
+                                    html.Div(id='rec-low-count', style={'color':'blue', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
+                        ],
+                            className='six columns'
+                        ),
                     ],
                         className='row'
                     ),
@@ -241,8 +253,9 @@ def select_graph(selected_graph):
     elif selected_graph == 'past-graph':
         return dcc.Graph(id='past-graph')
 
-@app.callback(
+@app.callback([
     Output('rec-high-count', 'children'),
+    Output('rec-low-count', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
 def update_daily_stats(n):
     df = pd.read_csv('../../tempjan19.csv', header=None)
@@ -252,19 +265,27 @@ def update_daily_stats(n):
    
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
-  
     rh_tot = daily_high[1]
-   
-    years = rh_tot.tolist()
 
-    year_list = []
-    for x in years:
-        year_list.append(x.year)
+    daily_lows = df_s.resample('D').min()
+    daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
+    rl_tot = daily_low[1]
+
+    h_years = rh_tot.tolist()
+    l_years = rl_tot.tolist()
+
+    h_year_list = []
+    for x in h_years:
+        h_year_list.append(x.year)
+
+    l_year_list = []
+    for x in l_years:
+        l_year_list.append(x.year)
     
-    counts = collections.Counter(year_list)
-    print(counts[2018])
+    h_counts = collections.Counter(h_year_list)
+    l_counts = collections.Counter(l_year_list)
 
-    return html.P('2018: {}'.format(counts[2018])), html.P('2019: {}'.format(counts[2019]))
+    return html.P('2018: {} \n 2019: {}'.format(h_counts[2018], h_counts[2019])), html.P('2018: {} \n 2019: {}'.format(l_counts[2018], l_counts[2019]))
 
 @app.callback([
     Output('rec-high', 'children'),
@@ -280,7 +301,7 @@ def update_daily_stats(n, record_highs, record_lows):
     record_high = record_highs.loc[record_highs.index == today]
     record_low = record_lows.loc[record_lows.index == today]
 
-    return html.P('High: {:.1f}'.format(record_high.iloc[0,1])), html.P('Low: {:.1f}'.format(record_low.iloc[0,1])),
+    return html.P('High: {:.1f}'.format(record_high.iloc[0,1])), html.P('Low: {:.1f}'.format(record_low.iloc[0,1]))
    
 @app.callback([
     Output('daily-high', 'children'),
