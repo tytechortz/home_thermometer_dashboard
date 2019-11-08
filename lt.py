@@ -184,19 +184,6 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.Div('Counts', style={'text-align': 'center'}),
-                            ],
-                                className='round1'
-                            ),
-                        ],
-                            className='twelve columns'
-                        ),
-                    ],
-                        className='row'
-                    ),
-                    html.Div([
-                        html.Div([
-                            html.Div([
                                 html.Div([
                                     html.P('Record Highs', style={'color':'red', 'text-align':'center'}),
                                     html.Div(id='rec-high-count', style={'color':'red', 'text-align':'center'}),
@@ -285,7 +272,14 @@ def update_daily_stats(n):
     h_counts = collections.Counter(h_year_list)
     l_counts = collections.Counter(l_year_list)
 
-    return html.P('2018: {} \n 2019: {}'.format(h_counts[2018], h_counts[2019])), html.P('2018: {} \n 2019: {}'.format(l_counts[2018], l_counts[2019]))
+    return [html.Div([
+        html.P('2018: {}'.format(h_counts[2018])), 
+        html.P('2019: {}'.format(h_counts[2019]))
+    ]),
+    html.Div([
+        html.P('2018: {}'.format(l_counts[2018])), 
+        html.P('2019: {}'.format(l_counts[2019]))
+    ])]
 
 @app.callback([
     Output('rec-high', 'children'),
