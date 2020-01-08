@@ -521,6 +521,10 @@ def update_graph(n, daily_data, last_year, y2018, y2019, selected_graph, yest):
     dfly['time'] = pd.to_datetime(dfly[0])
     dfly['time'] = dfly['time'].dt.strftime('%H:%M')
 
+    df2018 = pd.read_json(y2018)
+    df2018['time'] = pd.to_datetime(df2018[0])
+    df2018['time'] = df2018['time'].dt.strftime('%H:%M')
+
     df2019 = pd.read_json(y2019)
     df2019['time'] = pd.to_datetime(df2019[0])
     df2019['time'] = df2019['time'].dt.strftime('%H:%M')
