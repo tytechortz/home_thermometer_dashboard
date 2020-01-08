@@ -218,7 +218,9 @@ def get_layout():
             html.Div([
                 html.Div([
                     html.Div([
-                        
+                        html.Div([
+                            html.P('Averages YTD', style={'text-align':'center'})
+                        ])
                     ],
                         className='round1'
                     ),
