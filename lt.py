@@ -416,7 +416,7 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
     tm = int(selected_date[5:7])
     ty = int(selected_date[0:4])
 
-    # today = time.strftime("%Y-%m-%d")
+    today = time.strftime("%Y-%m-%d")
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df['time'] = pd.to_datetime(df[0])
     df = df.set_index('time')
@@ -425,21 +425,37 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
     years = [x for x in years if str(x) != 'nan']
     years = [int(i) for i in years]
 
+    if today >= selected_date:
 
-    today_data = df.loc[selected_date]
-    data = []
-    frames = []
+        today_data = df.loc[selected_date]
+        data = []
+        frames = []
 
-    for year in years:
-        frames.append(df.loc[str(year)+'-'+str(tm)+'-'+str(td)])
+        for year in years:
+            frames.append(df.loc[str(year)+'-'+str(tm)+'-'+str(td)])
 
-    for frame in frames:
-        data.append(go.Scatter(
-            x = frame.index.strftime('%H:%M'),
-            y = frame[1],
-            mode = 'markers+lines',
-            name = frame.index[0].year
-        ))
+        for frame in frames:
+            data.append(go.Scatter(
+                x = frame.index.strftime('%H:%M'),
+                y = frame[1],
+                mode = 'markers+lines',
+                name = frame.index[0].year
+            ))
+    else:
+        today_data = df.loc[selected_date]
+        data = []
+        frames = []
+
+        for year in years[:-1]:
+            frames.append(df.loc[str(year)+'-'+str(tm)+'-'+str(td)])
+
+        for frame in frames:
+            data.append(go.Scatter(
+                x = frame.index.strftime('%H:%M'),
+                y = frame[1],
+                mode = 'markers+lines',
+                name = frame.index[0].year
+            ))
 
   
     # dfd = df[df.index.day == td]
@@ -489,9 +505,11 @@ def hist_graph(selected_date, daily_data, selected_graph, last_year):
     [Input('interval-component', 'n_intervals'),
     Input('daily-data', 'children'),
     Input('last-year', 'children'),
+    Input('y2018', 'children'),
+    Input('y2019', 'children'),
     Input('graph-picker', 'value'),
     Input('yest', 'children')])
-def update_graph(n, daily_data, last_year, selected_graph, yest):
+def update_graph(n, daily_data, last_year, y2018, y2019, selected_graph, yest):
     dfdmy = pd.read_json(daily_data)
     dfdmy['time'] = pd.to_datetime(dfdmy[0])
     dfdmy['time'] = dfdmy['time'].dt.strftime('%H:%M')
@@ -502,6 +520,10 @@ def update_graph(n, daily_data, last_year, selected_graph, yest):
     dfly = pd.read_json(last_year)
     dfly['time'] = pd.to_datetime(dfly[0])
     dfly['time'] = dfly['time'].dt.strftime('%H:%M')
+
+    df2019 = pd.read_json(y2019)
+    df2019['time'] = pd.to_datetime(df2019[0])
+    df2019['time'] = df2019['time'].dt.strftime('%H:%M')
 
     # if selected_date == ''
 
@@ -525,13 +547,13 @@ def update_graph(n, daily_data, last_year, selected_graph, yest):
             name='today'
         ),
         go.Scatter(
-            x = dfly['time'],
-            y = dfly[1],
+            x = df2019['time'],
+            y = df2019[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'gold',
+                color = 'blue',
             ),
-            name='last year'
+            name='2019'
         ),
     ]
     layout = go.Layout(
