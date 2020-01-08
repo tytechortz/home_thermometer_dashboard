@@ -209,6 +209,34 @@ def get_layout():
                     ],
                         className='row'
                     ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div([
+                                    html.P('High Lows', style={'color':'red', 'text-align':'center'}),
+                                    html.Div(id='high-low-count', style={'color':'red', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
+                        ],
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div([
+                                    html.P('Low Highs', style={'color':'blue', 'text-align':'center'}),
+                                    html.Div(id='low-high-count', style={'color':'blue', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
+                        ],
+                            className='six columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
                 ],
                 className='four columns'
                 ),
@@ -232,6 +260,15 @@ def get_layout():
                         ])
                     ],
                         className='round1'
+                    ),
+                    html.Div([
+                    #     html.Div([
+
+                    #     ],
+                    #         className=
+                    #     ),
+                    ],
+                        className='row'
                     ),
                 ],
                     className='four columns'
@@ -308,6 +345,50 @@ def update_daily_stats(n):
         html.P('2018: {}'.format(l_counts[2018])), 
         html.P('2019: {}'.format(l_counts[2019])),
         html.P('2020: {}'.format(l_counts[2020])),
+    ])]
+
+@app.callback([
+    Output('high-low-count', 'children'),
+    Output('low-high-count', 'children')],
+    [Input('interval-component-graph', 'n_intervals')])
+def low_high_stats(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df_s = df
+    df_s['date'] = pd.to_datetime(df_s[0])
+    df_s = df_s.set_index('date')
+    print(df_s)
+   
+    daily_highs = df_s.resample('D').max()
+    daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
+    h_l_tot = daily_high[1]
+
+    daily_lows = df_s.resample('D').min()
+    daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
+    l_h_tot = daily_low[1]
+
+    h_l_years = h_l_tot.tolist()
+    l_h_years = l_h_tot.tolist()
+
+    h_l_year_list = []
+    for x in h_l_years:
+        h_l_year_list.append(x.year)
+
+    l_h_year_list = []
+    for x in l_h_years:
+        l_h_year_list.append(x.year)
+    
+    h_l_counts = collections.Counter(h_l_year_list)
+    l_h_counts = collections.Counter(l_h_year_list)
+
+    return [html.Div([
+        html.P('2018: {}'.format(h_l_counts[2018])), 
+        html.P('2019: {}'.format(h_l_counts[2019])),
+        html.P('2020: {}'.format(h_l_counts[2020])),
+    ]),
+    html.Div([
+        html.P('2018: {}'.format(l_h_counts[2018])), 
+        html.P('2019: {}'.format(l_h_counts[2019])),
+        html.P('2020: {}'.format(l_h_counts[2020])),
     ])]
 
 @app.callback([
