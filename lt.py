@@ -215,7 +215,22 @@ def get_layout():
             ],
                 className='row'
             ),
+            html.Div([
+                html.Div([
+                    html.Div([
+                        
+                    ],
+                        className='round1'
+                    ),
+                ],
+                    className='four columns'
+                ),
+            ],
+                className='row'
+            ),
             html.Div(id='daily-data', style={'display': 'none'}),
+            html.Div(id='y2018', style={'display': 'none'}),
+            html.Div(id='y2019', style={'display': 'none'}),
             html.Div(id='last-year', style={'display': 'none'}),
             html.Div(id='yest', style={'display': 'none'}),
             html.Div(id='record-high-temps', style={'display': 'none'}),
@@ -274,11 +289,13 @@ def update_daily_stats(n):
 
     return [html.Div([
         html.P('2018: {}'.format(h_counts[2018])), 
-        html.P('2019: {}'.format(h_counts[2019]))
+        html.P('2019: {}'.format(h_counts[2019])),
+        html.P('2020: {}'.format(h_counts[2020])),
     ]),
     html.Div([
         html.P('2018: {}'.format(l_counts[2018])), 
-        html.P('2019: {}'.format(l_counts[2019]))
+        html.P('2019: {}'.format(l_counts[2019])),
+        html.P('2020: {}'.format(l_counts[2020])),
     ])]
 
 @app.callback([
@@ -331,6 +348,8 @@ def update_layout(n):
 
 @app.callback([
     Output('daily-data', 'children'),
+    Output('y2018', 'children'),
+    Output('y2019', 'children'),
     Output('last-year', 'children'),
     Output('yest', 'children'),
     Output('record-high-temps', 'children'),
@@ -362,6 +381,8 @@ def process_df_daily(n):
     # print(dfdmy)
 
     dfly = dfdm[dfdm.index.year == ly]
+    df2018 = dfdm[dfdm.index.year == 2018]
+    df2019 = dfdm[dfdm.index.year == 2019]
     # print(dfly)
    
     record_high_temps = df_stats.groupby(df_stats.index.strftime('%m-%d')).max()
@@ -395,7 +416,7 @@ def process_df_daily(n):
     elif td == 1:
         df_yest = df_stats[(df_stats.index.day == months.get(tm)) & (df_stats.index.month == tm-1) & (df_stats.index.year == ty)]
 
-    return (dfdmy.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), 
+    return (dfdmy.to_json(), df2018.to_json(), df2019.to_json(), dfly.to_json(), df_yest.to_json(), record_high_temps.to_json(), record_low_temps.to_json(), 
         html.P('{}'.format(rec_high_date)), 
         html.P('{}'.format(rec_low_date)), 
         html.P('LH: {:.1f}'.format(rec_low_high)), 
@@ -537,7 +558,7 @@ def update_graph(n, daily_data, last_year, y2018, y2019, selected_graph, yest):
             y = yest[1],
             mode = 'markers+lines',
             marker = dict(
-                color = 'blue',
+                color = 'black',
             ),
             name='yesterday'
         ),
@@ -549,6 +570,15 @@ def update_graph(n, daily_data, last_year, y2018, y2019, selected_graph, yest):
                 color = 'red',
             ),
             name='today'
+        ),
+        go.Scatter(
+            x = df2018['time'],
+            y = df2018[1],
+            mode = 'markers+lines',
+            marker = dict(
+                color = 'dodgerblue',
+            ),
+            name='2018'
         ),
         go.Scatter(
             x = df2019['time'],
