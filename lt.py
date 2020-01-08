@@ -219,13 +219,30 @@ def get_layout():
                 html.Div([
                     html.Div([
                         html.Div([
-                            html.P('Averages YTD', style={'text-align':'center'})
-                        ])
+                            html.Div([
+                                html.P('Averages YTD', style={'text-align':'center'})
+                            ])
+                        ],
+                            className='round1'
+                        ),
                     ],
-                        className='round1'
+                        className='four columns'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.P('Placeholder', style={'text-align':'center'})
+                        ],
+                            className='round1'
+                        ),
+                    ],
+                        className='four columns'
+                    ),
+                    html.Div([
+                    ],
+                        className='four columns'
                     ),
                 ],
-                    className='four columns'
+                    className='twelve columns'
                 ),
             ],
                 className='row'
