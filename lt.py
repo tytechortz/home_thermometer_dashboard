@@ -326,6 +326,8 @@ def update_daily_stats(n):
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
     rh_tot = daily_high[1]
+    # print(daily_highs)
+    # print(rh_tot)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
@@ -333,10 +335,13 @@ def update_daily_stats(n):
 
     h_years = rh_tot.tolist()
     l_years = rl_tot.tolist()
+    
 
     h_year_list = []
     for x in h_years:
         h_year_list.append(x.year)
+
+    # print(h_year_list)
 
     l_year_list = []
     for x in l_years:
@@ -365,15 +370,16 @@ def low_high_stats(n):
     df_s = df
     df_s['date'] = pd.to_datetime(df_s[0])
     df_s = df_s.set_index('date')
-    print(df_s)
+    # print(df_s)
    
     daily_highs = df_s.resample('D').max()
-    daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
-    h_l_tot = daily_high[1]
+    daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmin()
+    l_h_tot = daily_high[1]
+    print(l_h_tot)
 
     daily_lows = df_s.resample('D').min()
-    daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
-    l_h_tot = daily_low[1]
+    daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmax()
+    h_l_tot = daily_low[1]
 
     h_l_years = h_l_tot.tolist()
     l_h_years = l_h_tot.tolist()
