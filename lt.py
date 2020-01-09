@@ -205,7 +205,7 @@ def get_layout():
                         className='row'
                     ),
                 ],
-                className='four columns'
+                    className='four columns'
                 ),
                 html.Div([
                     html.Div(id='graph'),
@@ -220,26 +220,25 @@ def get_layout():
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.P('High Lows', style={'color':'red', 'text-align':'center'}),
-                                html.Div(id='high-low-count', style={'color':'red', 'text-align':'center'}),
-                            ])
+                                html.Div([
+                                    html.P('High Lows', style={'color':'red', 'text-align':'center'}),
+                                    html.Div(id='high-low-count', style={'color':'red', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
                         ],
-                            className='round1'
-                        ), 
-                    ],
-                        className='six columns'
-                    ),
-                    html.Div([
+                            className='six columns'
+                        ),
                         html.Div([
                             html.Div([
-                                html.P('Low Highs', style={'color':'blue', 'text-align':'center'}),
-                                html.Div(id='low-high-count', style={'color':'blue', 'text-align':'center'}),
+                                html.P('Place Holder 2')
                             ])
                         ],
-                            className='round1'
-                        ), 
+                            className='six columns'
+                        ),
                     ],
-                        className='six columns'
+                        className='row'
                     ),
                 ],
                     className='four columns'
@@ -247,6 +246,47 @@ def get_layout():
             ],
                 className='row'
             ),
+            # html.Div([
+            #     html.Div([
+            #         html.Div([
+            #             html.Div([
+            #                 html.Div([
+            #                     html.Div([
+            #                         html.P('High Lows', style={'color':'red', 'text-align':'center'}),
+            #                         html.Div(id='high-low-count', style={'color':'red', 'text-align':'center'}),
+            #                     ])
+            #                 ],
+            #                     className='round1'
+            #                 ), 
+            #             ],
+            #                 className='six columns'
+            #             ),
+            #             html.Div([
+            #                 html.Div([
+            #                     html.Div([
+            #                         html.P('Low Highs', style={'color':'blue', 'text-align':'center'}),
+            #                         html.Div(id='low-high-count', style={'color':'blue', 'text-align':'center'}),
+            #                     ])
+            #                 ],
+            #                     className='round1'
+            #                 ), 
+            #             ],
+            #                 className='six columns'
+            #             ),
+            #         ],
+            #             className='four columns'
+            #         ),
+            #         html.Div([
+            #             html.P('Placeholder', style={'text-align':'center'})
+            #         ],
+            #             # className='round1'
+            #         ),
+            #     ],
+            #         className='four columns'
+            #     ),
+            # ],
+            #     className='row'
+            # ),
             html.Div([
                 html.Div([
                     html.Div([
