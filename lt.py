@@ -232,8 +232,13 @@ def get_layout():
                         ),
                         html.Div([
                             html.Div([
-                                html.P('Place Holder 2')
-                            ])
+                                html.Div([
+                                    html.P('Low Highs', style={'color':'blue', 'text-align':'center'}),
+                                    html.Div(id='low-high-count', style={'color':'blue', 'text-align':'center'}),
+                                ])
+                            ],
+                                className='round1'
+                            ), 
                         ],
                             className='six columns'
                         ),
