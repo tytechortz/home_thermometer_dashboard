@@ -16,6 +16,9 @@ url = "http://10.0.1.7:8080"
 
 # print(df)
 today = time.strftime("%Y-%m-%d")
+print(today)
+day_of_year = dt.now().timetuple().tm_yday
+print(day_of_year)
 
 def get_layout():
     return html.Div(
@@ -24,7 +27,40 @@ def get_layout():
                 html.Div([
                     html.Div(id='live-thermometer', style={'color':'green', 'font-size': 40, 'font-family':'sans-serif'})
                 ],
-                className='six columns'
+                    className='eight columns'
+                ),
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.P('Today', style={'text-align':'center'})
+                        ])
+                    ],
+                        className='round1'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div(id='daily-high', style={'color':'red', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div(id='daily-low', style={'color':'blue', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                ],
+                    className='four columns'
                 ),
             ],
                 className='row'
@@ -65,41 +101,11 @@ def get_layout():
             ]),
             html.Div([
                 html.Div([
-                    html.Div([
-                        html.Div([
-                            html.Div([
-                                html.Div('Today', style={'text-align': 'center'}),
-                            ],
-                                className='round1'
-                            ),
-                        ],
-                            className='twelve columns'
-                        ),
-                    ],
-                        className='row'
-                    ),
-                    html.Div([
-                        html.Div([
-                            html.Div([
-                                html.Div(id='daily-high', style={'color':'red', 'text-align':'center'})
-                            ],
-                                className='round1'
-                            ),
-                        ],
-                            className='six columns'
-                        ),
-                        html.Div([
-                            html.Div([
-                                html.Div(id='daily-low', style={'color':'blue', 'text-align':'center'})
-                            ],
-                                className='round1'
-                            ),
-                        ],
-                            className='six columns'
-                        ),
-                    ],
-                        className='row'
-                    ),
+                    html.Div(id='graph'),
+                ],
+                    className='eight columns'
+                ),
+                html.Div([
                     html.Div([
                         html.Div([
                             html.Div([
@@ -126,6 +132,41 @@ def get_layout():
                         html.Div([
                             html.Div([
                                 html.Div(id='yest-low', style={'color':'blue', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div('Average YTD', style={'text-align': 'center'}),
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div(id='avg-high', style={'color':'red', 'text-align':'center'})
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='six columns'
+                        ),
+                        html.Div([
+                            html.Div([
+                                html.Div(id='avg-low', style={'color':'blue', 'text-align':'center'})
                             ],
                                 className='round1'
                             ),
@@ -207,11 +248,7 @@ def get_layout():
                 ],
                     className='four columns'
                 ),
-                html.Div([
-                    html.Div(id='graph'),
-                ],
-                    className='eight columns'
-                ),
+                
             ],
                 className='row'
             ),
@@ -314,6 +351,65 @@ def select_graph(selected_graph):
         return dcc.Graph(id='past-graph')
 
 @app.callback([
+    Output('avg-high', 'children'),
+    Output('avg-low', 'children')],
+    [Input('interval-component-graph', 'n_intervals')])
+def averages(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df_s = df
+    df_s['date'] = pd.to_datetime(df_s[0])
+    df_s = df_s.set_index('date')
+   
+    daily_highs = df_s.resample('D').max()
+    daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
+    # rh_tot = daily_high[1]
+    print(daily_highs)
+    highs_2018 = daily_highs[daily_highs.index.year == 2018]
+    print(highs_2018)
+    to_date_2018 = highs_2018.head(day_of_year)
+    avg_high_to_date_2018 = to_date_2018[1].mean()
+
+    highs_2019 = daily_highs[daily_highs.index.year == 2019]
+    to_date_2019 = highs_2019.head(day_of_year)
+    avg_high_to_date_2019 = to_date_2019[1].mean()
+   
+    highs_2020 = daily_highs[daily_highs.index.year == 2020]
+    to_date_2020 = highs_2020.head(day_of_year)
+    avg_high_to_date_2020 = to_date_2020[1].mean()
+
+    daily_lows = df_s.resample('D').min()
+    daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
+    # rl_tot = daily_low[1]
+
+    # h_years = rh_tot.tolist()
+    # l_years = rl_tot.tolist()
+    
+
+    # h_year_list = []
+    # for x in h_years:
+    #     h_year_list.append(x.year)
+
+    # print(h_year_list)
+
+    # l_year_list = []
+    # for x in l_years:
+    #     l_year_list.append(x.year)
+    
+    # h_counts = collections.Counter(h_year_list)
+    # l_counts = collections.Counter(l_year_list)
+
+    return [html.Div([
+        html.P('2018: {:.1f}'.format(avg_high_to_date_2018)), 
+        html.P('2019: {:.1f}'.format(avg_high_to_date_2019)),
+        html.P('2020: {:.1f}'.format(avg_high_to_date_2020)),
+    ]),
+    html.Div([
+        html.P('2018: {:.1f}'.format(avg_high_to_date_2018)), 
+        html.P('2019: {:.1f}'.format(avg_high_to_date_2019)),
+        html.P('2020: {:.1f}'.format(avg_high_to_date_2020)),
+    ])]
+
+@app.callback([
     Output('rec-high-count', 'children'),
     Output('rec-low-count', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
@@ -375,7 +471,7 @@ def low_high_stats(n):
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmin()
     l_h_tot = daily_high[1]
-    print(l_h_tot)
+    # print(l_h_tot)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmax()
