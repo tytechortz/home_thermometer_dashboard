@@ -362,10 +362,8 @@ def averages(n):
    
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
-    # rh_tot = daily_high[1]
-    print(daily_highs)
+   
     highs_2018 = daily_highs[daily_highs.index.year == 2018]
-    print(highs_2018)
     to_date_2018 = highs_2018.head(day_of_year)
     avg_high_to_date_2018 = to_date_2018[1].mean()
 
@@ -379,6 +377,19 @@ def averages(n):
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
+
+
+    lows_2018 = daily_lows[daily_lows.index.year == 2018]
+    to_date_2018 = lows_2018.head(day_of_year)
+    avg_low_to_date_2018 = to_date_2018[1].mean()
+
+    highs_2019 = daily_highs[daily_highs.index.year == 2019]
+    to_date_2019 = highs_2019.head(day_of_year)
+    avg_high_to_date_2019 = to_date_2019[1].mean()
+   
+    highs_2020 = daily_highs[daily_highs.index.year == 2020]
+    to_date_2020 = highs_2020.head(day_of_year)
+    avg_high_to_date_2020 = to_date_2020[1].mean()
     # rl_tot = daily_low[1]
 
     # h_years = rh_tot.tolist()
@@ -404,7 +415,7 @@ def averages(n):
         html.P('2020: {:.1f}'.format(avg_high_to_date_2020)),
     ]),
     html.Div([
-        html.P('2018: {:.1f}'.format(avg_high_to_date_2018)), 
+        html.P('2018: {:.1f}'.format(avg_low_to_date_2018)), 
         html.P('2019: {:.1f}'.format(avg_high_to_date_2019)),
         html.P('2020: {:.1f}'.format(avg_high_to_date_2020)),
     ])]
