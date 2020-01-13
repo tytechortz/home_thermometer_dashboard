@@ -387,9 +387,9 @@ def averages(n):
     to_date_2019 = lows_2019.head(day_of_year)
     avg_low_to_date_2019 = to_date_2019[1].mean()
    
-    highs_2020 = daily_highs[daily_highs.index.year == 2020]
-    to_date_2020 = highs_2020.head(day_of_year)
-    avg_high_to_date_2020 = to_date_2020[1].mean()
+    lows_2020 = daily_lows[daily_lows.index.year == 2020]
+    to_date_2020 = lows_2020.head(day_of_year)
+    avg_low_to_date_2020 = to_date_2020[1].mean()
     # rl_tot = daily_low[1]
 
     # h_years = rh_tot.tolist()
@@ -417,7 +417,7 @@ def averages(n):
     html.Div([
         html.P('2018: {:.1f}'.format(avg_low_to_date_2018)), 
         html.P('2019: {:.1f}'.format(avg_low_to_date_2019)),
-        html.P('2020: {:.1f}'.format(avg_high_to_date_2020)),
+        html.P('2020: {:.1f}'.format(avg_low_to_date_2020)),
     ])]
 
 @app.callback([
