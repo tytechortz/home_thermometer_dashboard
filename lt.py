@@ -390,24 +390,7 @@ def averages(n):
     lows_2020 = daily_lows[daily_lows.index.year == 2020]
     to_date_2020 = lows_2020.head(day_of_year)
     avg_low_to_date_2020 = to_date_2020[1].mean()
-    # rl_tot = daily_low[1]
-
-    # h_years = rh_tot.tolist()
-    # l_years = rl_tot.tolist()
-    
-
-    # h_year_list = []
-    # for x in h_years:
-    #     h_year_list.append(x.year)
-
-    # print(h_year_list)
-
-    # l_year_list = []
-    # for x in l_years:
-    #     l_year_list.append(x.year)
-    
-    # h_counts = collections.Counter(h_year_list)
-    # l_counts = collections.Counter(l_year_list)
+   
 
     return [html.Div([
         html.P('2018: {:.1f}'.format(avg_high_to_date_2018)), 
