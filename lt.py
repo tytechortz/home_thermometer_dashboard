@@ -17,8 +17,7 @@ url = "http://10.0.1.7:8080"
 # print(df)
 today = time.strftime("%Y-%m-%d")
 print(today)
-day_of_year = dt.now().timetuple().tm_yday
-print(day_of_year)
+
 
 def get_layout():
     return html.Div(
@@ -355,6 +354,8 @@ def select_graph(selected_graph):
     Output('avg-low', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
 def averages(n):
+    day_of_year = dt.now().timetuple().tm_yday
+    print(day_of_year)
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df_s = df
     df_s['date'] = pd.to_datetime(df_s[0])
@@ -364,32 +365,34 @@ def averages(n):
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
    
     highs_2018 = daily_highs[daily_highs.index.year == 2018]
-    to_date_2018 = highs_2018.head(day_of_year)
-    avg_high_to_date_2018 = to_date_2018[1].mean()
+    highs_to_date_2018 = highs_2018.head(day_of_year)
+    avg_high_to_date_2018 = highs_to_date_2018[1].mean()
 
     highs_2019 = daily_highs[daily_highs.index.year == 2019]
-    to_date_2019 = highs_2019.head(day_of_year)
-    avg_high_to_date_2019 = to_date_2019[1].mean()
+    highs_to_date_2019 = highs_2019.head(day_of_year)
+    avg_high_to_date_2019 = highs_to_date_2019[1].mean()
    
     highs_2020 = daily_highs[daily_highs.index.year == 2020]
-    to_date_2020 = highs_2020.head(day_of_year)
-    avg_high_to_date_2020 = to_date_2020[1].mean()
+    highs_to_date_2020 = highs_2020.head(day_of_year)
+    avg_high_to_date_2020 = highs_to_date_2020[1].mean()
+    print(highs_to_date_2020)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
 
 
     lows_2018 = daily_lows[daily_lows.index.year == 2018]
-    to_date_2018 = lows_2018.head(day_of_year)
-    avg_low_to_date_2018 = to_date_2018[1].mean()
+    lows_to_date_2018 = lows_2018.head(day_of_year)
+    avg_low_to_date_2018 = lows_to_date_2018[1].mean()
 
     lows_2019 = daily_lows[daily_lows.index.year == 2019]
-    to_date_2019 = lows_2019.head(day_of_year)
-    avg_low_to_date_2019 = to_date_2019[1].mean()
+    lows_to_date_2019 = lows_2019.head(day_of_year)
+    avg_low_to_date_2019 = lows_to_date_2019[1].mean()
    
     lows_2020 = daily_lows[daily_lows.index.year == 2020]
-    to_date_2020 = lows_2020.head(day_of_year)
-    avg_low_to_date_2020 = to_date_2020[1].mean()
+    lows_to_date_2020 = lows_2020.head(day_of_year)
+    avg_low_to_date_2020 = lows_to_date_2020[1].mean()
+    
    
 
     return [html.Div([
