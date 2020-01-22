@@ -375,7 +375,7 @@ def averages(n):
     highs_2020 = daily_highs[daily_highs.index.year == 2020]
     highs_to_date_2020 = highs_2020.head(day_of_year)
     avg_high_to_date_2020 = highs_to_date_2020[1].mean()
-    print(highs_to_date_2020)
+    # print(highs_to_date_2020)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
@@ -411,22 +411,26 @@ def averages(n):
     Output('rec-low-count', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
 def update_daily_stats(n):
+    day_of_year = dt.now().timetuple().tm_yday
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df_s = df
     df_s['date'] = pd.to_datetime(df_s[0])
     df_s = df_s.set_index('date')
+    # df_s = df_s.head(day_of_year)
+    # print(df_s)
    
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
     rh_tot = daily_high[1]
+    rh_doy = rh_tot.head(day_of_year)
     # print(daily_highs)
-    # print(rh_tot)
+    print(rh_doy)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
     rl_tot = daily_low[1]
 
-    h_years = rh_tot.tolist()
+    h_years = rh_doy.tolist()
     l_years = rl_tot.tolist()
     
 
