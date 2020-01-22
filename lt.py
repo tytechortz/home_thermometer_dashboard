@@ -429,9 +429,10 @@ def update_daily_stats(n):
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
     rl_tot = daily_low[1]
+    rl_doy = rl_tot.head(day_of_year)
 
     h_years = rh_doy.tolist()
-    l_years = rl_tot.tolist()
+    l_years = rl_doy.tolist()
     
 
     h_year_list = []
