@@ -416,15 +416,12 @@ def update_daily_stats(n):
     df_s = df
     df_s['date'] = pd.to_datetime(df_s[0])
     df_s = df_s.set_index('date')
-    # df_s = df_s.head(day_of_year)
-    # print(df_s)
+   
    
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmax()
     rh_tot = daily_high[1]
     rh_doy = rh_tot.head(day_of_year)
-    # print(daily_highs)
-    print(rh_doy)
 
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmin()
@@ -439,7 +436,6 @@ def update_daily_stats(n):
     for x in h_years:
         h_year_list.append(x.year)
 
-    # print(h_year_list)
 
     l_year_list = []
     for x in l_years:
