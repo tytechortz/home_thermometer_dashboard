@@ -476,8 +476,9 @@ def low_high_stats(n):
     daily_lows = df_s.resample('D').min()
     daily_low = daily_lows.groupby([daily_lows.index.month, daily_lows.index.day]).idxmax()
     h_l_tot = daily_low[1]
+    h_l_day = h_l_tot.head(day_of_year)
 
-    h_l_years = h_l_tot.tolist()
+    h_l_years = h_l_day.tolist()
     l_h_years = l_h_day.tolist()
 
     h_l_year_list = []
