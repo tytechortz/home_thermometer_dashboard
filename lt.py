@@ -803,4 +803,4 @@ def update_graph(n, daily_data, last_year, y2018, y2019, selected_graph, yest):
   
 
 if __name__ == "__main__":
-    app.run_server(port=8050, debug=False)
+    app.run_server(port=8045, debug=False)
