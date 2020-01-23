@@ -460,6 +460,7 @@ def update_daily_stats(n):
     Output('low-high-count', 'children')],
     [Input('interval-component-graph', 'n_intervals')])
 def low_high_stats(n):
+    day_of_year = dt.now().timetuple().tm_yday
     df = pd.read_csv('../../tempjan19.csv', header=None)
     df_s = df
     df_s['date'] = pd.to_datetime(df_s[0])
@@ -469,6 +470,7 @@ def low_high_stats(n):
     daily_highs = df_s.resample('D').max()
     daily_high = daily_highs.groupby([daily_highs.index.month, daily_highs.index.day]).idxmin()
     l_h_tot = daily_high[1]
+    l_h_day = l_h_tot.head(day_of_year)
     # print(l_h_tot)
 
     daily_lows = df_s.resample('D').min()
@@ -476,7 +478,7 @@ def low_high_stats(n):
     h_l_tot = daily_low[1]
 
     h_l_years = h_l_tot.tolist()
-    l_h_years = l_h_tot.tolist()
+    l_h_years = l_h_day.tolist()
 
     h_l_year_list = []
     for x in h_l_years:
