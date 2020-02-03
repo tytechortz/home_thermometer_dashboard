@@ -284,6 +284,25 @@ def get_layout():
                 ],
                     className='four columns'
                 ),
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div([
+                                    html.P('Yearly High', style={'color':'red', 'text-align': 'center'})
+                                ])
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                ],
+                    className='two columns'
+                ),
             ],
                 className='row'
             ),
