@@ -379,6 +379,34 @@ app = dash.Dash(__name__)
 app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
 
+@app.callback(Output('annual-high', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_f(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = dt.now().year
+    dfy = df[df.index.year == ty]
+    yearly_high = dfy[1].max()
+    # return 'Yearly High: {:.1f}'.format(yearly_high)
+    return [html.Div([
+        html.P('{:.1f}'.format(yearly_high))
+    ])]
+
+@app.callback(Output('annual-low', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_g(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = dt.now().year
+    dfy = df[df.index.year == ty]
+    yearly_low = dfy[1].min()
+    return [html.Div([
+        html.P('{:.1f}'.format(yearly_low)) 
+    ])],
+
+
 @app.callback(
     Output('graph', 'children'),
     [Input('graph-picker', 'value')])
