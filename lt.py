@@ -291,6 +291,8 @@ def get_layout():
                                 html.Div([
                                     html.P('Yearly High', style={'color':'red', 'text-align': 'center'}),
                                     html.Div(id='annual-high', style={'color':'red', 'text-align':'center'}),
+                                    html.Div(id='annual-high-date', style={'color':'red',
+                                    'text-align':'center'})
                                 ])
                             ],
                                 className='round1'
@@ -311,7 +313,9 @@ def get_layout():
                                 html.Div([
                                     html.P('Yearly Low', style={'color':'blue', 'text-align': 'center'}),
                                     html.Div(id='annual-low', style={'color':'blue', 'text-align':'center'}),
-                                ]),
+                                    html.Div(id='annual-low-date', style={'color':'blue',
+                                    'text-align':'center'})
+                                ])
                             ],
                                 className='round1'
                             ),
@@ -379,6 +383,34 @@ app = dash.Dash(__name__)
 app.layout = get_layout
 app.config['suppress_callback_exceptions']=True
 
+@app.callback(Output('annual-high-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_n(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = dt.now().year
+    dfy = df[df.index.year == ty]
+    yearly_high_date = dfy[1].idxmax()
+    return [html.Div([
+        html.P('{}'.format(yearly_high_date))
+    ])]
+
+@app.callback(Output('annual-low-date', 'children'),
+              [Input('interval-component', 'n_intervals')])
+def update_layout_o(n):
+    df = pd.read_csv('../../tempjan19.csv', header=None)
+    df['datetime'] = pd.to_datetime(df[0])
+    df = df.set_index('datetime')
+    ty = dt.now().year
+    dfy = df[df.index.year == ty]
+    yearly_low_date = dfy[1].idxmin()
+    print('XXXXXXXXXXXXXXXXXXXXXXXX')
+    print(yearly_low_date)
+    return [html.Div([
+        html.P('{}'.format(yearly_low_date))
+    ])]
+
 @app.callback(Output('annual-high', 'children'),
               [Input('interval-component', 'n_intervals')])
 def update_layout_f(n):
@@ -388,7 +420,6 @@ def update_layout_f(n):
     ty = dt.now().year
     dfy = df[df.index.year == ty]
     yearly_high = dfy[1].max()
-    # return 'Yearly High: {:.1f}'.format(yearly_high)
     return [html.Div([
         html.P('{:.1f}'.format(yearly_high))
     ])]
@@ -404,7 +435,7 @@ def update_layout_g(n):
     yearly_low = dfy[1].min()
     return [html.Div([
         html.P('{:.1f}'.format(yearly_low)) 
-    ])],
+    ])]
 
 
 @app.callback(
