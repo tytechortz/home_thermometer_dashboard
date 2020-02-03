@@ -289,8 +289,29 @@ def get_layout():
                         html.Div([
                             html.Div([
                                 html.Div([
-                                    html.P('Yearly High', style={'color':'red', 'text-align': 'center'})
+                                    html.P('Yearly High', style={'color':'red', 'text-align': 'center'}),
+                                    html.Div(id='annual-high', style={'color':'red', 'text-align':'center'}),
                                 ])
+                            ],
+                                className='round1'
+                            ),
+                        ],
+                            className='twelve columns'
+                        ),
+                    ],
+                        className='row'
+                    ),
+                ],
+                    className='two columns'
+                ),
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.Div([
+                                html.Div([
+                                    html.P('Yearly Low', style={'color':'blue', 'text-align': 'center'}),
+                                    html.Div(id='annual-low', style={'color':'blue', 'text-align':'center'}),
+                                ]),
                             ],
                                 className='round1'
                             ),
